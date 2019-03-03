@@ -46,21 +46,34 @@ fn preflight_checks(args: Args) -> Result<(), Box<Error>> {
 
     authenticated_to_cluster(&cli)?;
 
-    // TODO: get attached cluster
     let cluster = cli.attached_cluster()?;
 
-    // TODO: get information on requested service
+    let (package_name, package_version) = match cli.marathon_app(&args.service_name) {
+        Ok(app) => {
+            let name = app.labels.get("DCOS_PACKAGE_NAME")
+                .unwrap().clone();
+            let version = app.labels.get("DCOS_PACKAGE_VERSION")
+                .unwrap().clone();
+            (name, version)
+        },
+        Err(_err) => {
+            (args.package_name.clone(), "n/a".to_owned())
+        },
+    };
 
-    // TODO: check that the package name given matches what the cluster says
+    if args.package_name != package_name {
+        panic!("package names don't match");
+    }
+
     Ok(())
 }
 
 fn authenticated_to_cluster(cli: &Cli) -> Result<(), Box<Error>> {
     let output = cli.run(&["service"])?;
 
-    if !output.status.success() {
+    if !output.success() {
         // TODO: make this an error instead of a panic
-        panic!("{}", String::from_utf8(output.stderr).unwrap());
+        panic!("{}", output.stderr_str()?);
     }
 
     Ok(())
