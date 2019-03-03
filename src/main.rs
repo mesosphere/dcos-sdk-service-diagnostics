@@ -1,11 +1,9 @@
 
-use failure::{Error, ResultExt};
-use structopt::StructOpt;
-
-use std::path::PathBuf;
-
 mod cli_command;
 
+use structopt::StructOpt;
+use std::path::PathBuf;
+use std::error::Error;
 use cli_command::Cli;
 
 #[derive(Debug, StructOpt)]
@@ -43,15 +41,27 @@ fn main() {
 }
 
 
-fn preflight_checks(args: Args) -> Result<(), Error> {
-    let _cli = Cli::new(&args.cli_path);
+fn preflight_checks(args: Args) -> Result<(), Box<Error>> {
+    let cli = Cli::new(&args.cli_path);
 
-    // TODO: check if authed to cluster
+    authenticated_to_cluster(&cli)?;
 
     // TODO: get attached cluster
+    let cluster = cli.attached_cluster()?;
 
     // TODO: get information on requested service
 
     // TODO: check that the package name given matches what the cluster says
+    Ok(())
+}
+
+fn authenticated_to_cluster(cli: &Cli) -> Result<(), Box<Error>> {
+    let output = cli.run(&["service"])?;
+
+    if !output.status.success() {
+        // TODO: make this an error instead of a panic
+        panic!("{}", String::from_utf8(output.stderr).unwrap());
+    }
+
     Ok(())
 }
