@@ -1,10 +1,13 @@
 
 mod cli_command;
+mod errors;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
 use std::error::Error;
+
 use cli_command::Cli;
+use errors::DiagError;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name="service-diagnostics")]
@@ -35,13 +38,14 @@ struct Args {
     cli_path: PathBuf,
 }
 
-fn main() {
+fn main() -> Result<(), DiagError> {
     let args = Args::from_args();
-    preflight_checks(args).unwrap();
+
+    preflight_checks(args)
 }
 
 
-fn preflight_checks(args: Args) -> Result<(), Box<Error>> {
+fn preflight_checks(args: Args) -> Result<(), DiagError> {
     let cli = Cli::new(&args.cli_path);
 
     authenticated_to_cluster(&cli)?;
@@ -50,10 +54,14 @@ fn preflight_checks(args: Args) -> Result<(), Box<Error>> {
 
     let (package_name, package_version) = match cli.marathon_app(&args.service_name) {
         Ok(app) => {
-            let name = app.labels.get("DCOS_PACKAGE_NAME")
-                .unwrap().clone();
-            let version = app.labels.get("DCOS_PACKAGE_VERSION")
-                .unwrap().clone();
+            let name = match app.labels.get("DCOS_PACKAGE_NAME") {
+                Some(n) => n.clone(),
+                None => return Err(DiagError::custom("Marathon app def missing DCOS_PACKAGE_NAME")),
+            };
+            let version = match app.labels.get("DCOS_PACKAGE_VERSION") {
+                Some(n) => n.clone(),
+                None => return Err(DiagError::custom("Marathon app def missing DCOS_PACKAGE_VERSION")),
+            };
             (name, version)
         },
         Err(_err) => {
@@ -62,18 +70,18 @@ fn preflight_checks(args: Args) -> Result<(), Box<Error>> {
     };
 
     if args.package_name != package_name {
-        panic!("package names don't match");
+        let msg = format!("Given package name {} does not match found name {}", args.package_name, package_name);
+        return Err(DiagError::custom(&msg))
     }
 
     Ok(())
 }
 
-fn authenticated_to_cluster(cli: &Cli) -> Result<(), Box<Error>> {
+fn authenticated_to_cluster(cli: &Cli) -> Result<(), DiagError> {
     let output = cli.run(&["service"])?;
 
     if !output.success() {
-        // TODO: make this an error instead of a panic
-        panic!("{}", output.stderr_str()?);
+        return Err(DiagError::custom(&output.stderr_str()?))
     }
 
     Ok(())
