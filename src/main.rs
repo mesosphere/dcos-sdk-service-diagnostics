@@ -4,7 +4,6 @@ mod errors;
 
 use structopt::StructOpt;
 use std::path::PathBuf;
-use std::error::Error;
 
 use cli_command::Cli;
 use errors::DiagError;

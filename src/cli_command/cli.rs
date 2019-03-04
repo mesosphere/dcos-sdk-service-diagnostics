@@ -1,7 +1,7 @@
 /// Wrapper around calls to the DCOS CLI
 
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::Command;
 use std::error::Error;
 
 use super::errors::CliError;
