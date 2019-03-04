@@ -40,7 +40,10 @@ struct Args {
 fn main() -> Result<(), DiagError> {
     let args = Args::from_args();
 
-    preflight_checks(args)
+    if let Err(err) = preflight_checks(args) {
+        dbg!(err);
+    }
+    Ok(())
 }
 
 
@@ -63,7 +66,8 @@ fn preflight_checks(args: Args) -> Result<(), DiagError> {
             };
             (name, version)
         },
-        Err(_err) => {
+        Err(err) => {
+            dbg!(err);
             (args.package_name.clone(), "n/a".to_owned())
         },
     };
@@ -73,6 +77,10 @@ fn preflight_checks(args: Args) -> Result<(), DiagError> {
         return Err(DiagError::custom(&msg))
     }
 
+    dbg!(cluster);
+    dbg!(package_name);
+    dbg!(package_version);
+    println!("preflight OK");
     Ok(())
 }
 
