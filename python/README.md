@@ -37,7 +37,7 @@ v2/debug/offers below in upcoming releases.
 1. Download the latest version
 
    ```bash
-   wget https://infinity-artifacts.s3.amazonaws.com/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh
+   get https://infinity-artifacts.s3.amazonaws.com/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh
    chmod +x create_service_diagnostics_bundle.sh
    ```
 
@@ -83,23 +83,28 @@ $ zip -r my-dcos-cluster_prod__cassandra_20180912T142246Z.zip my-dcos-cluster_pr
 
 ## Development
 
+The dcos-commons repository is used as git submodule. The script depends on its testing library.
+
+### Cloning the repository 
+```git clone --recurse-submodules git@github.com:mesosphere/dcos-sdk-service-diagnostics.git```
+
 ### Working with the shell script
-The `./tools/diagnostics/create_service_diagnostics_bundle.sh` script runs a
+The `./create_service_diagnostics_bundle.sh` script runs a
 Python script in a Docker container.
 
 To make it to pick up local changes made to Python modules just run the
 repository script:
 
-1. `cd` to your dcos-commons repository directory
+1. `cd` to your dcos-sdk-service-diagnostics repository python directory
    ```bash
-   cd /path/to/dcos-commons
+   cd /path/to/dcos-sdk-service-diagnostics/python
    ```
 
-1. Make changes to Python modules under `/path/to/dcos-commons/tools/diagnostics`
+1. Make changes to Python modules under `/path/to/dcos-sdk-service-diagnostics/python` (and `/path/to/dcos-sdk-service-diagnostics/python/dcos-commons/testing` when necessary)
 
 1. Run repository script
    ```bash
-   ./tools/diagnostics/create_service_diagnostics_bundle.sh --package-name=cassandra --service-name=/prod/cassandra
+   ./create_service_diagnostics_bundle.sh --package-name=cassandra --service-name=/prod/cassandra
    ```
 
 ### Releasing a new version
@@ -111,10 +116,10 @@ Requires AWS S3 credentials.
 1. Wait for PR to be merged to master
 
 1. Push a new PR with a `VERSION` bump in
-   `tools/diagnostics/create_service_diagnostics_bundle.sh` and a new
+   `create_service_diagnostics_bundle.sh` and a new
    `CHANGELOG.md` entry
 
-   `tools/diagnostics/create_service_diagnostics_bundle.sh`:
+   `create_service_diagnostics_bundle.sh`:
    ```bash
    readonly VERSION='vx.y.z'
    ```
@@ -123,14 +128,14 @@ Requires AWS S3 credentials.
    ```markdown
    ## vx.y.z (YYYY-MM-DD) - Release title
    ### New features
-       - foo (commit URL)
-       - bar (commit URL)
+       - Foo. (commit URL)
+       - Bar. (commit URL)
    ### Bug fixes
-       - baz (commit URL)
-       - qux (commit URL)
+       - Baz. (commit URL)
+       - Qux. (commit URL)
    ### Improvements
-       - quux (commit URL)
-       - quuz (commit URL)
+       - Quux. (commit URL)
+       - Quuz. (commit URL)
    ```
 
 1. Wait for PR to be merged to master
@@ -140,17 +145,17 @@ Requires AWS S3 credentials.
    - With the [Jenkins job](https://jenkins.mesosphere.com/service/jenkins/view/Infinity/job/infinity-tools/job/release-tools/job/build-docker-image)
 
      Make sure to set `IMAGE_TAG` correctly. For example, if `VERSION` is
-     `v1.0.0`, `IMAGE_TAG` should be `diagnostics-v1.0.0`.
+     `v0.3.1`, `IMAGE_TAG` should be `v0.3.1-python`.
 
-     | Parameter          | Value                  |
-     | ------------------ | ---------------------- |
-     | `DOCKER_FILE_PATH` | Dockerfile             |
-     | `DOCKER_ORG`       | mesosphere             |
-     | `IMAGE_TAG`        | diagnostics-`$VERSION` |
-     | `IMAGE_NAME`       | dcos-commons           |
-     | `GITHUB_ORG`       | mesosphere             |
-     | `GITHUB_REPO`      | dcos-commons           |
-     | `GIT_REF`          | master                 |
+     | Parameter          | Value                        |
+     | ------------------ | ---------------------------- |
+     | `DOCKER_FILE_PATH` | python/Dockerfile            |
+     | `DOCKER_ORG`       | mesosphere                   |
+     | `IMAGE_TAG`        | `$VERSION`-python            |
+     | `IMAGE_NAME`       | dcos-sdk-service-diagnostics |
+     | `GITHUB_ORG`       | mesosphere                   |
+     | `GITHUB_REPO`      | dcos-sdk-service-diagnostics |
+     | `GIT_REF`          | master                       |
 
    - Or manually
 
@@ -159,8 +164,8 @@ Requires AWS S3 credentials.
      git stash
      git checkout master
      git reset --hard upstream/master
-     docker build -t "mesosphere/dcos-commons:diagnostics-${VERSION}" .
-     docker push "mesosphere/dcos-commons:diagnostics-${VERSION}"
+     docker build -t "mesosphere/dcos-sdk-service-diagnostics:${VERSION}-python" .
+     docker push "mesosphere/dcos-sdk-service-diagnostics:${VERSION}-python"
      git checkout -
      git stash pop
      ```
@@ -172,7 +177,7 @@ Requires AWS S3 credentials.
       ```bash
       aws s3 cp \
         --acl=public-read \
-        tools/diagnostics/create_service_diagnostics_bundle.sh \
+        ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/${VERSION}/create_service_diagnostics_bundle.sh"
       ```
 
@@ -181,6 +186,6 @@ Requires AWS S3 credentials.
       ```bash
       aws s3 cp \
         --acl=public-read \
-        tools/diagnostics/create_service_diagnostics_bundle.sh \
+        ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
       ```
