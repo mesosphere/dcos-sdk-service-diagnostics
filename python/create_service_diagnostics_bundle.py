@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 
 # Dependencies:
-# - DC/OS CLI
-
-# Notes:
-# - When run in the dcos-commons Docker image the DC/OS CLI version is specified either in
-# - the image's test_requirements.txt, frozen_requirements.txt or Dockerfile.
+# - DC/OS CLI (specified in requirement.txt)
 
 from typing import Any
 import argparse
@@ -149,6 +145,7 @@ def preflight_check() -> (int, dict):
     bundles_directory = args.bundles_directory
     should_prompt_user = not args.yes
 
+    print("Checking authentication to DC/OS cluster...")
     (is_authenticated, message) = is_authenticated_to_dcos_cluster()
     if not is_authenticated:
         log.error(
@@ -157,6 +154,7 @@ def preflight_check() -> (int, dict):
         )
         return (1, {})
 
+    print("Checking attached DC/OS cluster state...")
     (rc, cluster_or_error) = attached_dcos_cluster()
     if rc != 0:
         log.error(
@@ -166,6 +164,7 @@ def preflight_check() -> (int, dict):
 
     cluster = cluster_or_error
 
+    print("Getting scheduler information...")
     (rc, marathon_app_or_error) = get_marathon_app(service_name)
     if rc == 0:
         package_name = marathon_app_or_error.get("labels", {}).get("DCOS_PACKAGE_NAME")
