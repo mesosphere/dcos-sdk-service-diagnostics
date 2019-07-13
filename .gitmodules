@@ -1,0 +1,3 @@
+[submodule "python/dcos-commons"]
+	path = python/dcos-commons
+	url = git@github.com:mesosphere/dcos-commons.git
