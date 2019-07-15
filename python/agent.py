@@ -1,7 +1,9 @@
 import logging
 import os
 import re
+import datetime
 from typing import List
+from functools import reduce
 
 import sdk_cmd
 
@@ -124,23 +126,26 @@ def download_sandbox_files(
 
 
 def download_task_files(
-    agent_id: str,
+    task,
     executor_sandbox_path: str,
-    task_id: str,
     base_path: str,
     patterns_to_download: List[str] = [],
 ) -> List[dict]:
+    agent_id = task["slave_id"]
+    task_id = task["id"]
+    task_id_with_prefix = build_task_state_timestamps(task) + "/" + task_id
+
     executor_sandbox = browse_executor_sandbox(agent_id, executor_sandbox_path)
     pod_task_sandbox = browse_task_sandbox(agent_id, executor_sandbox_path, task_id)
 
     # Pod task: download files under its sandbox and also under its parent executor's sandbox.
     if pod_task_sandbox:
-        output_pod_task_directory = os.path.join(base_path, task_id, "task")
+        output_pod_task_directory = os.path.join(base_path, task_id_with_prefix, "task")
         download_sandbox_files(
             agent_id, pod_task_sandbox, output_pod_task_directory, patterns_to_download
         )
 
-        output_executor_directory = os.path.join(base_path, task_id, "executor")
+        output_executor_directory = os.path.join(base_path, task_id_with_prefix, "executor")
         download_sandbox_files(
             agent_id, executor_sandbox, output_executor_directory, patterns_to_download
         )
@@ -148,3 +153,13 @@ def download_task_files(
     else:
         output_directory = os.path.join(base_path, task_id)
         download_sandbox_files(agent_id, executor_sandbox, output_directory, patterns_to_download)
+
+
+def build_task_state_timestamps(task):
+    task_state_timestamps = reduce(lambda result, status:
+                                   result + status["state"] + "_" + datetime.datetime.fromtimestamp(status["timestamp"])
+                            .strftime("%Y%m%dT%H%M%S") + "-",
+                            task["statuses"], "")
+    task_state_timestamps = task_state_timestamps.replace("TASK_", "")
+    task_state_timestamps = task_state_timestamps[:-1]
+    return task_state_timestamps

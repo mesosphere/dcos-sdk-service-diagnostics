@@ -49,20 +49,18 @@ class ServiceBundle(Bundle):
 
         tasks_by_agent_id = dict(groupby("slave_id", all_tasks))
 
-        agent_id_by_task_id = dict(map(lambda task: (task["id"], task["slave_id"]), all_tasks))
-
-        agent_executor_paths = {}
-        for agent_id in tasks_by_agent_id.keys():
-            agent_executor_paths[agent_id] = agent.debug_agent_files(agent_id)
-
-        task_executor_sandbox_paths = {}
         for agent_id, tasks in tasks_by_agent_id.items():
             for task in tasks:
                 task_executor_sandbox_path = sdk_diag._find_matching_executor_path(
-                    agent_executor_paths[agent_id], sdk_diag._TaskEntry(task)
+                    agent.debug_agent_files(agent_id), sdk_diag._TaskEntry(task)
                 )
                 if task_executor_sandbox_path:
-                    task_executor_sandbox_paths[task["id"]] = task_executor_sandbox_path
+                    agent.download_task_files(
+                        task,
+                        task_executor_sandbox_path,
+                        os.path.join(self.output_directory, "tasks"),
+                        self.DOWNLOAD_FILES_WITH_PATTERNS,
+                    )
                 else:
                     log.info(
                         "Could not find executor sandbox path for task '%s'. "
@@ -71,23 +69,6 @@ class ServiceBundle(Bundle):
                         task["slave_id"],
                     )
 
-        for task_id, task_executor_sandbox_path in task_executor_sandbox_paths.items():
-            agent_id = agent_id_by_task_id[task_id]
-
-            if task_executor_sandbox_path:
-                agent.download_task_files(
-                    agent_id,
-                    task_executor_sandbox_path,
-                    task_id,
-                    os.path.join(self.output_directory, "tasks"),
-                    self.DOWNLOAD_FILES_WITH_PATTERNS,
-                )
-            else:
-                log.warn(
-                    "Could not find executor sandbox path in agent '%s' for task '%s'",
-                    agent_id,
-                    task_id,
-                )
 
     @config.retry
     def create_offers_file(self):
