@@ -50,7 +50,7 @@ class ServiceBundle(Bundle):
         tasks_by_agent_id = dict(groupby("slave_id", all_tasks))
 
         for agent_id, tasks in tasks_by_agent_id.items():
-            debug_agent_files = agent.debug_agent_files(agent_id)
+            agent_files = agent.debug_agent_files(agent_id)
             for task in tasks:
                 task_executor_sandbox_path = sdk_diag._find_matching_executor_path(
                     agent_files, sdk_diag._TaskEntry(task)
