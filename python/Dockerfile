@@ -16,6 +16,7 @@ RUN apk add --no-cache --virtual=.build-dependencies \
         build-base    \
         openssl-dev   \
         libffi-dev && \
+        pip install --upgrade pip &&\
         pip install pipenv && \
         cd /dcos-service-diagnostics-dist/ && \
         pipenv install --system && \

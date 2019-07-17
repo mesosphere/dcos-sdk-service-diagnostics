@@ -1,8 +1,16 @@
 # CHANGELOG
 
+## v0.3.2 (2019-07-24)
+
+### Improvements
+   - Allow sorting of tasks directories fetched by service diagnostic bundle.
+   ([PR 1](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/4))
+   ([PR 2](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/6))
+
 ## v0.3.1 (2019-07-13)
 
-   - The diagnostics tools is extracted from `dcos-sdk-service-diagnostics` into a separate git repo.
+### Improvements
+   - The diagnostics tools is extracted from `dcos-commons` into a separate git repo.
    - The tool is packed into own docker image now, which is based on a vanilla python3.7-alpine3.9 image. 
      ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/3))
 
