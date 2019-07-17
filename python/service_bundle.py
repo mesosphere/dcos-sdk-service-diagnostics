@@ -53,7 +53,7 @@ class ServiceBundle(Bundle):
             debug_agent_files = agent.debug_agent_files(agent_id)
             for task in tasks:
                 task_executor_sandbox_path = sdk_diag._find_matching_executor_path(
-                    debug_agent_files, sdk_diag._TaskEntry(task)
+                    agent_files, sdk_diag._TaskEntry(task)
                 )
                 if task_executor_sandbox_path:
                     agent.download_task_files(
