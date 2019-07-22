@@ -133,7 +133,7 @@ def download_task_files(
 ) -> List[dict]:
     agent_id = task["slave_id"]
     task_id = task["id"]
-    task_id_with_prefix = build_task_state_timestamps(task) + "/" + task_id
+    task_id_with_prefix = build_task_state_timestamps(task) + "." + task_id
 
     executor_sandbox = browse_executor_sandbox(agent_id, executor_sandbox_path)
     pod_task_sandbox = browse_task_sandbox(agent_id, executor_sandbox_path, task_id)
@@ -151,15 +151,15 @@ def download_task_files(
         )
     # Scheduler task: no parent executor, only download files under its sandbox.
     else:
-        output_directory = os.path.join(base_path, task_id)
+        output_directory = os.path.join(base_path, task_id_with_prefix)
         download_sandbox_files(agent_id, executor_sandbox, output_directory, patterns_to_download)
 
 
 def build_task_state_timestamps(task):
     task_state_timestamps = reduce(lambda result, status:
-                                   result + status["state"] + "_" + datetime.datetime.fromtimestamp(status["timestamp"])
+                                   result + status["state"].lower() + "_" + datetime.datetime.fromtimestamp(status["timestamp"])
                             .strftime("%Y%m%dT%H%M%S") + "-",
                             task["statuses"], "")
-    task_state_timestamps = task_state_timestamps.replace("TASK_", "")
+    task_state_timestamps = task_state_timestamps.replace("task_", "")
     task_state_timestamps = task_state_timestamps[:-1]
     return task_state_timestamps
