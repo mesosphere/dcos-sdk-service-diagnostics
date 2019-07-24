@@ -133,33 +133,44 @@ def download_task_files(
 ) -> List[dict]:
     agent_id = task["slave_id"]
     task_id = task["id"]
-    task_id_with_prefix = build_task_state_timestamps(task) + "/" + task_id
+    task_folder_name = build_task_folder_mame(task)
 
     executor_sandbox = browse_executor_sandbox(agent_id, executor_sandbox_path)
     pod_task_sandbox = browse_task_sandbox(agent_id, executor_sandbox_path, task_id)
 
     # Pod task: download files under its sandbox and also under its parent executor's sandbox.
     if pod_task_sandbox:
-        output_pod_task_directory = os.path.join(base_path, task_id_with_prefix, "task")
+        output_pod_task_directory = os.path.join(base_path, task_folder_name, "task")
         download_sandbox_files(
             agent_id, pod_task_sandbox, output_pod_task_directory, patterns_to_download
         )
 
-        output_executor_directory = os.path.join(base_path, task_id_with_prefix, "executor")
+        output_executor_directory = os.path.join(base_path, task_folder_name, "executor")
         download_sandbox_files(
             agent_id, executor_sandbox, output_executor_directory, patterns_to_download
         )
     # Scheduler task: no parent executor, only download files under its sandbox.
     else:
-        output_directory = os.path.join(base_path, task_id)
+        output_directory = os.path.join(base_path, task_folder_name)
         download_sandbox_files(agent_id, executor_sandbox, output_directory, patterns_to_download)
+
+
+def build_task_folder_mame(task):
+    match = re.search("([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})", task["id"])
+    if match is not None:
+        task_uuid = match.group(0)
+        folder_name = build_task_state_timestamps(task) + "__" + task["name"] + "__" + task_uuid
+    else:
+        folder_name = build_task_state_timestamps(task) + "__" + task["id"]
+
+    return folder_name
 
 
 def build_task_state_timestamps(task):
     task_state_timestamps = reduce(lambda result, status:
-                                   result + status["state"] + "_" + datetime.datetime.fromtimestamp(status["timestamp"])
+                                   result + status["state"].lower() + "_" + datetime.datetime.fromtimestamp(status["timestamp"])
                             .strftime("%Y%m%dT%H%M%S") + "-",
                             task["statuses"], "")
-    task_state_timestamps = task_state_timestamps.replace("TASK_", "")
+    task_state_timestamps = task_state_timestamps.replace("task_", "")
     task_state_timestamps = task_state_timestamps[:-1]
     return task_state_timestamps
