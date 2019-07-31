@@ -43,7 +43,6 @@ else
 fi
 
 readonly CONTAINER_SCRIPT_PATH="${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/${SCRIPT_NAME}"
-readonly CONTAINER_PYTHONPATH="${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}"
 
 function version () {
   echo "${VERSION}"
@@ -54,7 +53,7 @@ if [ "${#}" -eq 1 ] && [[ "${1}" =~ ^(--version|-version|version|--v|-v)$ ]]; th
   exit 0
 fi
 
-readonly REQUIREMENTS='docker'
+readonly REQUIREMENTS=('docker' 'dcos')
 
 for requirement in ${REQUIREMENTS}; do
   if ! [[ -x $(command -v "${requirement}") ]]; then
@@ -73,12 +72,13 @@ function container_run () {
          -v "$(pwd)/${BUNDLES_DIRECTORY}:${CONTAINER_BUNDLES_DIRECTORY}" \
          -v "${HOME}/.dcos:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
          ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
+         -e PYTHONPATH=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY} \
          "${DOCKER_IMAGE}" \
          sh -l -c "${command}"
 }
 
 function usage () {
-  container_run "PYTHONPATH=${CONTAINER_PYTHONPATH} ${CONTAINER_SCRIPT_PATH} --help"
+  container_run "${CONTAINER_SCRIPT_PATH} --help"
 }
 
 if [ "${#}" -eq 1 ] && [[ "${1}" =~ ^(--help|-help|help|--h|-h)$ ]]; then
@@ -88,11 +88,32 @@ fi
 
 echo "Initializing diagnostics..."
 
+HOST_DCOS_CLI_MAJOR_VERSION=$(dcos --version | grep dcoscli.version | awk -F"=" '{split($2,verPart,".");print verPart[1]"."verPart[2]}')
+echo "Host's dcos-cli major version is ${HOST_DCOS_CLI_MAJOR_VERSION}"
+
+DCOS_CLUSTER_MAJOR_VERSION=$(dcos --version | grep dcos.version | awk -F"=" '{split($2,verPart,".");print verPart[1]"."verPart[2]}')
+echo "Lincked DC/OS cluster major version is ${DCOS_CLUSTER_MAJOR_VERSION}"
+readonly DCOS_TO_CLI_COMPATIBILITY="
+1.10 0.5
+1.11 0.6
+1.12 0.7
+1.13 0.8"
+
+DCOS_CLI_COMPATIBLE_VERSION=$(echo "${DCOS_TO_CLI_COMPATIBILITY}" | grep  "${DCOS_CLUSTER_MAJOR_VERSION}" | awk '{print $2}')
+echo "dcos-cli compatible version for DC/OS ${DCOS_CLUSTER_MAJOR_VERSION}.x is ${DCOS_CLI_COMPATIBLE_VERSION}.x"
+
+if [ "${HOST_DCOS_CLI_MAJOR_VERSION}" != "${DCOS_CLI_COMPATIBLE_VERSION}" ]; then
+  echo "Warning! Installed dcoscli version is NOT compatible with attached DC/OS cluster version.
+  Please, take care of install dcos-cli ${DCOS_CLI_COMPATIBLE_VERSION}.x"
+  exit 1;
+fi;
+
+
 container_run "rm -rf ${CONTAINER_DCOS_CLI_DIRECTORY} && mkdir ${CONTAINER_DCOS_CLI_DIRECTORY}
                cd ${CONTAINER_DCOS_CLI_DIRECTORY_RO}
                find . \
                  \( -name 'dcos.toml' -or -name 'attached' \) \
                  -exec cp --parents \{\} ${CONTAINER_DCOS_CLI_DIRECTORY} \;
                cd /
-               PYTHONPATH=${CONTAINER_PYTHONPATH} ${CONTAINER_SCRIPT_PATH} ${*} \
-                 --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY}"
+               rm -f /usr/local/bin/dcos && ln -s /usr/local/bin/dcos${HOST_DCOS_CLI_MAJOR_VERSION} /usr/local/bin/dcos
+               ${CONTAINER_SCRIPT_PATH} ${*} --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY}"
