@@ -28,7 +28,7 @@ class EdgeLBBundle(BaseTechBundle):
     @config.retry
     def create_version_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "version", print_output=False
+            self.cli_subcommand_name, self.service_name, "version", print_output=False
         )
 
         if rc != 0:
@@ -44,7 +44,7 @@ class EdgeLBBundle(BaseTechBundle):
     @config.retry
     def create_ping_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "ping", print_output=False
+            self.cli_subcommand_name, self.service_name, "ping", print_output=False
         )
 
         if rc != 0:
@@ -61,7 +61,7 @@ class EdgeLBBundle(BaseTechBundle):
     def create_pool_status_file(self, pool):
         pool_name = pool['name']
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "status {} --json".format(pool_name),
+            self.cli_subcommand_name, self.service_name, "status {} --json".format(pool_name),
             print_output=False
         )
 
@@ -80,7 +80,7 @@ class EdgeLBBundle(BaseTechBundle):
     def create_pool_endpoints_file(self, pool):
         pool_name = pool['name']
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "endpoints {} --json".format(pool_name),
+            self.cli_subcommand_name, self.service_name, "endpoints {} --json".format(pool_name),
             print_output=False
         )
 
@@ -99,7 +99,7 @@ class EdgeLBBundle(BaseTechBundle):
     def create_pool_lb_config_file(self, pool):
         pool_name = pool['name']
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "lb-config {}".format(pool_name),
+            self.cli_subcommand_name, self.service_name, "lb-config {}".format(pool_name),
             print_output=False
         )
 
@@ -118,7 +118,7 @@ class EdgeLBBundle(BaseTechBundle):
     def create_pool_lb_template_file(self, pool):
         pool_name = pool['name']
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "template show {}".format(pool_name),
+            self.cli_subcommand_name, self.service_name, "template show {}".format(pool_name),
             print_output=False
         )
 
@@ -136,7 +136,7 @@ class EdgeLBBundle(BaseTechBundle):
     @config.retry
     def create_pool_files(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "list --json", print_output=False
+            self.cli_subcommand_name, self.service_name, "list --json", print_output=False
         )
 
         if rc != 0:

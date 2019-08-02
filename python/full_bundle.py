@@ -163,7 +163,6 @@ class FullBundle(Bundle):
             )
 
         ServiceBundle(
-            self.package_name,
             self.service_name,
             scheduler_tasks,
             active_service,

@@ -20,7 +20,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_configuration_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "manager describe", print_output=False
+            self.cli_subcommand_name, self.service_name, "manager describe", print_output=False
         )
 
         if rc != 0:
@@ -36,7 +36,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_pod_status_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "manager pod status --json", print_output=False
+            self.cli_subcommand_name, self.service_name, "manager pod status --json", print_output=False
         )
 
         if rc != 0:
@@ -52,7 +52,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_plan_status_file(self, plan):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name,
+            self.cli_subcommand_name,
             self.service_name,
             "manager plan status {} --json".format(plan),
             print_output=False,
@@ -71,7 +71,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_plans_status_files(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "manager plan list", print_output=False
+            self.cli_subcommand_name, self.service_name, "manager plan list", print_output=False
         )
 
         if rc != 0:
@@ -96,7 +96,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_cluster_list(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "cluster list", print_output=False
+            self.cli_subcommand_name, self.service_name, "cluster list", print_output=False
         )
 
         if rc != 0:
@@ -112,7 +112,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_cluster_debug_state_properties(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "cluster debug state properties", print_output=False
+            self.cli_subcommand_name, self.service_name, "cluster debug state properties", print_output=False
         )
 
         if rc != 0:
@@ -128,7 +128,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_cluster_debug_endpoints(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "cluster debug endpoints", print_output=False
+            self.cli_subcommand_name, self.service_name, "cluster debug endpoints", print_output=False
         )
 
         if rc != 0:
@@ -144,7 +144,7 @@ class KubernetesBundle(BaseTechBundle):
     @config.retry
     def create_cluster_pod_status(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "cluster debug pod status --json", print_output=False
+            self.cli_subcommand_name, self.service_name, "cluster debug pod status --json", print_output=False
         )
 
         if rc != 0:
