@@ -55,10 +55,12 @@ ARG dcos110_cli_version=0.5.14
 ARG dcos111_cli_version=0.6.6
 ARG dcos112_cli_version=0.7.13
 ARG dcos113_cli_version=0.8.0
+ARG dcos114_cli_version=master
 ADD https://downloads.dcos.io/binaries/cli/linux/x86-64/$dcos110_cli_version/dcos /usr/local/bin/dcos0.5
 ADD https://downloads.dcos.io/binaries/cli/linux/x86-64/$dcos111_cli_version/dcos /usr/local/bin/dcos0.6
 ADD https://downloads.dcos.io/binaries/cli/linux/x86-64/$dcos112_cli_version/dcos /usr/local/bin/dcos0.7
 ADD https://downloads.dcos.io/binaries/cli/linux/x86-64/$dcos113_cli_version/dcos /usr/local/bin/dcos0.8
+ADD https://downloads.dcos.io/cli/testing/binaries/dcos/linux/x86-64/$dcos114_cli_version/dcos /usr/local/bin/dcos-$dcos114_cli_version
 
 RUN chmod +x /usr/local/bin/dcos*
 
