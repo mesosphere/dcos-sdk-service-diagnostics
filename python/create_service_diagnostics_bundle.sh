@@ -88,33 +88,20 @@ fi
 
 echo "Initializing diagnostics..."
 
-#HOST_DCOS_CLI_MAJOR_VERSION=$(dcos --version | grep dcoscli.version | awk -F"=" '{split($2,verPart,".");print verPart[1]"."verPart[2]}')
-#echo "Host's dcos-cli major version is ${HOST_DCOS_CLI_MAJOR_VERSION}"
-
 DCOS_CLUSTER_MAJOR_VERSION=$(dcos --version | grep dcos.version | awk -F"=" '{split($2,verPart,".");print verPart[1]"."verPart[2]}')
-echo "Linked DC/OS cluster major version is ${DCOS_CLUSTER_MAJOR_VERSION}"
-readonly DCOS_TO_CLI_COMPATIBILITY="
-1.10 0.5
-1.11 0.6
-1.12 0.7
-1.13 0.8
-1.14 -master"
+echo "Attached DC/OS cluster major version is ${DCOS_CLUSTER_MAJOR_VERSION}"
 
-DCOS_CLI_COMPATIBLE_VERSION=$(echo "${DCOS_TO_CLI_COMPATIBILITY}" | grep  "${DCOS_CLUSTER_MAJOR_VERSION}" | awk '{print $2}')
-if [ -z "${DCOS_CLI_COMPATIBLE_VERSION}" ]; then
+readonly SUPPORTED_DCOS_VERSIONS="
+1.10
+1.11
+1.12
+1.13
+1.14"
+if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_VERSION}"
+then
   echo "Error! DC/OS ${DCOS_CLUSTER_MAJOR_VERSION}.x is not supported by this tool. It supports DC/OS 1.10 - 1.14 versions."
   exit 1
 fi
-echo "dcos-cli compatible version for DC/OS ${DCOS_CLUSTER_MAJOR_VERSION}.x is ${DCOS_CLI_COMPATIBLE_VERSION}.x"
-
-# Due to the script doesn't copy all content of host's ~/.dcos to conteianer's that one (see lines 117-122) we aren't forced anymore to
-# make sure that the same version dcos-cli on host and inside container are used.
-
-#if [ "${HOST_DCOS_CLI_MAJOR_VERSION}" != "${DCOS_CLI_COMPATIBLE_VERSION}" ]; then
-#  echo "Error! Installed dcoscli version is NOT compatible with attached DC/OS cluster version.
-#  Please, take care of install dcos-cli ${DCOS_CLI_COMPATIBLE_VERSION}.x"
-#  exit 1
-#fi
 
 container_run "rm -rf ${CONTAINER_DCOS_CLI_DIRECTORY} && mkdir ${CONTAINER_DCOS_CLI_DIRECTORY}
                cd ${CONTAINER_DCOS_CLI_DIRECTORY_RO}
@@ -122,5 +109,5 @@ container_run "rm -rf ${CONTAINER_DCOS_CLI_DIRECTORY} && mkdir ${CONTAINER_DCOS_
                  \( -name 'dcos.toml' -or -name 'attached' \) \
                  -exec cp --parents \{\} ${CONTAINER_DCOS_CLI_DIRECTORY} \;
                cd /
-               rm -f /usr/local/bin/dcos && ln -s /usr/local/bin/dcos${DCOS_CLI_COMPATIBLE_VERSION} /usr/local/bin/dcos
+               dcos plugin add /tmp/dcos-core-cli-${DCOS_CLUSTER_MAJOR_VERSION}.zip
                ${CONTAINER_SCRIPT_PATH} ${*} --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY}"

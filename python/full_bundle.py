@@ -24,7 +24,7 @@ def get_dcos_services() -> (bool, str):
         "service --completed --inactive --json", print_output=False
     )
 
-    if rc != 0 or stderr:
+    if rc != 0:
         return (
             False,
             "Could not get services state\nstdout: '{}'\nstderr: '{}'".format(stdout, stderr),
@@ -61,6 +61,8 @@ def active_services_with_name(service_name: str, services: List[dict]) -> List[d
 
 def is_service_scheduler_task(package_name: str, service_name: str, task: dict) -> bool:
     labels = task.get("labels", [])
+    if not labels:
+        return False
     dcos_package_name = next(
         iter([l.get("value") for l in labels if l.get("key") == "DCOS_PACKAGE_NAME"]), ""
     )
