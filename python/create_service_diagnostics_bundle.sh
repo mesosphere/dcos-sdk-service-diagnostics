@@ -88,7 +88,7 @@ fi
 
 echo "Initializing diagnostics..."
 
-DCOS_CLUSTER_MAJOR_VERSION=$(dcos --version | grep dcos.version | awk -F"=" '{split($2,verPart,".");print verPart[1]"."verPart[2]}')
+DCOS_CLUSTER_MAJOR_VERSION=$(dcos --version | awk -F"=" '/^dcos.version=/ {split($2,verPart,".");print verPart[1]"."verPart[2]}')
 echo "Attached DC/OS cluster major version is ${DCOS_CLUSTER_MAJOR_VERSION}"
 
 readonly SUPPORTED_DCOS_VERSIONS="
