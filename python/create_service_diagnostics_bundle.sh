@@ -88,8 +88,8 @@ fi
 
 echo "Initializing diagnostics..."
 
-DCOS_CLUSTER_MAJOR_VERSION=$(dcos --version | awk -F"=" '/^dcos.version=/ {split($2,verPart,".");print verPart[1]"."verPart[2]}')
-echo "Attached DC/OS cluster major version is ${DCOS_CLUSTER_MAJOR_VERSION}"
+DCOS_CLUSTER_MAJOR_MINOR_VERSION=$(dcos --version | awk -F"=" '/^dcos.version=/ {split($2,verPart,".");print verPart[1]"."verPart[2]}')
+echo "Detected attached DC/OS cluster major and minor version as '${DCOS_CLUSTER_MAJOR_MINOR_VERSION}'"
 
 readonly SUPPORTED_DCOS_VERSIONS="
 1.10
@@ -97,9 +97,9 @@ readonly SUPPORTED_DCOS_VERSIONS="
 1.12
 1.13
 1.14"
-if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_VERSION}"
-then
-  echo "Error! DC/OS ${DCOS_CLUSTER_MAJOR_VERSION}.x is not supported by this tool. It supports DC/OS 1.10 - 1.14 versions."
+if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_MINOR_VERSION}"; then
+  echo "DC/OS ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.x is not supported by this tool."
+  echo "Supported DC/OS versions: ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}."
   exit 1
 fi
 
@@ -109,5 +109,5 @@ container_run "rm -rf ${CONTAINER_DCOS_CLI_DIRECTORY} && mkdir ${CONTAINER_DCOS_
                  \( -name 'dcos.toml' -or -name 'attached' \) \
                  -exec cp --parents \{\} ${CONTAINER_DCOS_CLI_DIRECTORY} \;
                cd /
-               dcos plugin add /tmp/dcos-core-cli-${DCOS_CLUSTER_MAJOR_VERSION}.zip
+               dcos plugin add /tmp/dcos-core-cli-${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.zip
                ${CONTAINER_SCRIPT_PATH} ${*} --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY}"
