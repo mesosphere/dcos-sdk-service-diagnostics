@@ -31,7 +31,7 @@ class KafkaBundle(BaseTechBundle):
     @config.retry
     def create_broker_list_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "broker list", print_output=False
+            self.cli_subcommand_name, self.service_name, "broker list", print_output=False
         )
 
         broker_list = None
@@ -58,7 +58,7 @@ class KafkaBundle(BaseTechBundle):
     @config.retry
     def create_broker_get_file(self, broker_id):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "broker get %s" % broker_id, print_output=False
+            self.cli_subcommand_name, self.service_name, "broker get %s" % broker_id, print_output=False
         )
 
         if rc != 0:

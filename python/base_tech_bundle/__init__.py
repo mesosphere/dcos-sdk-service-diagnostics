@@ -3,6 +3,8 @@ from service_bundle import ServiceBundle
 import json
 import logging
 import config
+import re
+
 import sdk_cmd
 
 log = logging.getLogger(__name__)
@@ -21,16 +23,22 @@ class BaseTechBundle(ServiceBundle):
 
     @config.retry
     def install_cli(self):
-        sdk_cmd.run_cli(
+        rc, stdout, stderr = sdk_cmd.run_cli(
             "package install {} --cli --yes".format(self.package_name),
             print_output=False,
             check=True,
         )
+        dcos_commands = re.search(r'New command available: dcos (\S+)', stdout)
+        if dcos_commands:
+            self.cli_subcommand_name = dcos_commands.group(1)
+        else:
+            self.cli_subcommand_name = self.package_name
+        log.info("Identified '{}' as the dcos-cli subcommand for '{}'".format(self.cli_subcommand_name, self.package_name))
 
     @config.retry
     def create_configuration_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "describe", print_output=False
+            self.cli_subcommand_name, self.service_name, "describe", print_output=False
         )
 
         if rc != 0:
@@ -46,7 +54,7 @@ class BaseTechBundle(ServiceBundle):
     @config.retry
     def create_pod_status_file(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "pod status --json", print_output=False
+            self.cli_subcommand_name, self.service_name, "pod status --json", print_output=False
         )
 
         if rc != 0:
@@ -62,7 +70,7 @@ class BaseTechBundle(ServiceBundle):
     @config.retry
     def create_plan_status_file(self, plan):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name,
+            self.cli_subcommand_name,
             self.service_name,
             "plan status {} --json".format(plan),
             print_output=False,
@@ -81,7 +89,7 @@ class BaseTechBundle(ServiceBundle):
     @config.retry
     def create_plans_status_files(self):
         rc, stdout, stderr = sdk_cmd.svc_cli(
-            self.package_name, self.service_name, "plan list", print_output=False
+            self.cli_subcommand_name, self.service_name, "plan list", print_output=False
         )
 
         if rc != 0:
