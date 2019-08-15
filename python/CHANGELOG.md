@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v0.4.0 (2019-08-15)
+
+### Bug fixes
+
+### New features
+   - Introduced support for dcos packages, which names aren't match to dcos subcommands names like dcos-monitoring.
+   ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/9))
+
+### Improvements
+   - Improved compatibility with DC/OS clusters by matching dcos-cli-core plugin to appropriate DC/OS cluster version.
+   ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/7))
+
+### Bug fixes
+   - Fixed an issue when host machine has different arch than linux x64, used in container.
+   - Fixed the docker run command hanging for minutes before showing the script output.
+   ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/8/))
+
 ## v0.3.2 (2019-07-24)
 
 ### Improvements
