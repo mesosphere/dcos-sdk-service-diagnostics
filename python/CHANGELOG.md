@@ -5,7 +5,7 @@
 ### Bug fixes
 
 ### New features
-   - Introduced support for dcos packages, which names aren't match to dcos subcommands names like dcos-monitoring.
+   - Introduced support for DC/OS packages whose CLI subcommand names don't match their package names, like "dcos-monitoring" and "kubernetes-cluster".
    ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/9))
 
 ### Improvements
