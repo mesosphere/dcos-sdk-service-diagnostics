@@ -2,7 +2,6 @@
 
 ## v0.4.0 (2019-08-15)
 
-### Bug fixes
 
 ### New features
    - Introduced support for DC/OS packages whose CLI subcommand names don't match their package names, like "dcos-monitoring" and "kubernetes-cluster".
