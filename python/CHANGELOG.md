@@ -2,7 +2,6 @@
 
 ## v0.4.0 (2019-08-15)
 
-
 ### New features
    - Introduced support for DC/OS packages whose CLI subcommand names don't match their package names, like "dcos-monitoring" and "kubernetes-cluster".
    ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/9))
