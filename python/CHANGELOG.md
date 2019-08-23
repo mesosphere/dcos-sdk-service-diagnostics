@@ -9,7 +9,7 @@
    ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/9))
 
 ### Improvements
-   - Improved compatibility with DC/OS clusters by matching dcos-cli-core plugin to appropriate DC/OS cluster version.
+   - Improved compatibility with DC/OS clusters by matching the "dcos-cli-core" plugin to the appropriate DC/OS cluster version.
    ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/7))
 
 ### Bug fixes
