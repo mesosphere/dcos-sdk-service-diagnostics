@@ -11,7 +11,7 @@
    ([PR](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/7))
 
 ### Bug fixes
-   - Fixed an issue when host machine has different arch than linux x64, used in container. ([changes](https://github.com/mesosphere/dcos-sdk-service-diagnostics/blob/0e5bd602203d167628fc2e33fa16817c245a2ad3/python/create_service_diagnostics_bundle.sh#L106-L111))
+   - Fixed an issue with host arch other than linux x64. ([changes](https://github.com/mesosphere/dcos-sdk-service-diagnostics/blob/0e5bd602203d167628fc2e33fa16817c245a2ad3/python/create_service_diagnostics_bundle.sh#L106-L111))
    - Fixed the docker run command hanging for minutes before showing the script output. ([changes](https://github.com/mesosphere/dcos-sdk-service-diagnostics/blob/0e5bd602203d167628fc2e33fa16817c245a2ad3/python/create_service_diagnostics_bundle.sh#L106-L111))
 
 ## v0.3.2 (2019-07-24)
