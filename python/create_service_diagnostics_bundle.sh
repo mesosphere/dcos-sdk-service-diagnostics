@@ -71,7 +71,7 @@ mkdir -p "${BUNDLES_DIRECTORY}"
 function container_run () {
   local -r command="${*:-}"
   docker run \
-         -it \
+         -t \
          --rm \
          -v "$(pwd)/${BUNDLES_DIRECTORY}:${CONTAINER_BUNDLES_DIRECTORY}" \
          -v "${HOST_DCOS_CLI_DIRECTORY}:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
