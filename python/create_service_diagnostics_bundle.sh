@@ -10,12 +10,7 @@ readonly VERSION='v0.4.0'
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
 readonly SCRIPT_NAME="create_service_diagnostics_bundle.py"
-
-if [ -z "${DCOS_DIR}" ]; then
-  readonly HOST_DCOS_CLI_DIRECTORY="${HOME}/.dcos"
-else
-  readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR}"
-fi
+readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
 
 readonly CONTAINER_BUNDLES_DIRECTORY="/${BUNDLES_DIRECTORY}"
 readonly CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
