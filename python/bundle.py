@@ -1,11 +1,16 @@
+from urllib.parse import urlparse
 import json
 import logging
 import os
+
 
 log = logging.getLogger(__name__)
 
 
 class Bundle:
+    def url_path_as_file_name(self, url_path):
+        return urlparse(url_path).path.replace("/", "_").strip("_")
+
     def write_file(self, file_name, content, serialize_to_json=False):
         """"
         Writes content to a file.
