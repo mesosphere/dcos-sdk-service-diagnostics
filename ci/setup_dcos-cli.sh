@@ -10,7 +10,8 @@ echo "##teamcity[setParameter name='env.PATH' value='${PATH}']"
 echo PATH: "$PATH"
 
 mkdir ./dcos_dir
-export DCOS_DIR=./dcos_dir
+DCOS_DIR=$(pwd)/dcos_dir
+export DCOS_DIR
 echo "##teamcity[setParameter name='env.DCOS_DIR' value='${DCOS_DIR}']"
 
 readonly USERNAME=bootstrapuser

@@ -1,16 +1,13 @@
 #!/bin/bash
 set -eu -o pipefail
 
-if [ -z "${DIAGNOSTICS_TEST_DATA_SERVICES}" ]; then
-  echo DcosSdkServiceDiagnostics_TEST_DATA_SERVICES var is null or empty.
-  exit 1
-fi
-
-echo PATH: "${PATH}"
-echo DCOS_DIR: "${DCOS_DIR}"
-echo DIAGNOSTICS_TEST_DATA_SERVICES: "${DIAGNOSTICS_TEST_DATA_SERVICES}"
-
-for service in "${DIAGNOSTICS_TEST_DATA_SERVICES[@]}"; do
-    echo "Installing package '${service}'."
-    dcos package install "${service}" --app --yes
-done
+readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
+docker run \
+  -t \
+  --rm \
+  -v "${HOST_DCOS_CLI_DIRECTORY}:/dcos-cli-directory":ro \
+  -v "$(pwd)/ci:/ci" \
+  -w "/ci" \
+  -e DCOS_CLI_AUTO_INIT="yes" \
+  "mesosphere/dcos-sdk-service-diagnostics:v0.4.0" \
+  ./install_data_services.py "$1"
