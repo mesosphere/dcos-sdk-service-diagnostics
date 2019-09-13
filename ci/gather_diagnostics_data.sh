@@ -11,12 +11,13 @@ if [ -z "${SERVICES}" ]; then
 fi
 
 chmod +x ./python/create_service_diagnostics_bundle.sh
-mkdir ../logs
 export TTY_OPTS="-t"
 for service in "${SERVICES[@]}"; do
     echo "Starting service diagnostics script for ${service}"
     ./python/create_service_diagnostics_bundle.sh \
         --package-name="${service}" \
         --service-name="${service}" \
-        --yes || true  >> ./logs/"${service}".log
+        --yes || true &
 done
+
+wait
