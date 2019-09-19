@@ -16,10 +16,8 @@ def install_package(package_name, service_name):
 
 
 def main(argv) -> int:
-    log.info("Specified data services list: %s", argv[1])
-    data_services = argv[1].split(",")
     executor = ThreadPoolExecutor(max_workers=10)
-    for data_service in data_services:
+    for data_service in argv[1:]:
         executor.submit(install_package, data_service, data_service)
 
     executor.shutdown(wait=True)

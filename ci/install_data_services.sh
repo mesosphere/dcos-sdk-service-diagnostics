@@ -10,4 +10,4 @@ docker run \
   -w "/ci" \
   -e DCOS_CLI_AUTO_INIT="yes" \
   "mesosphere/dcos-sdk-service-diagnostics:v0.4.0" \
-  ./install_data_services.py "$1"
+  ./install_data_services.py "$@"

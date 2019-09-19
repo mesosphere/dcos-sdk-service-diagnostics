@@ -10,4 +10,4 @@ docker run -it --rm \
   -e DCOS_SERVICE_DIAGNOSTICS_DIRECTORY=/dcos-service-diagnostics \
   -e DCOS_CLI_AUTO_INIT="yes" \
   "mesosphere/dcos-sdk-service-diagnostics:v0.4.0" \
-  ./install_data_services.py 'cassandra,confluent-kafka,confluent-zookeeper,datastax-dse,datastax-ops,elastic,hdfs,kafka-zookeeper,dcos-monitoring'
+  ./install_data_services.py cassandra confluent-kafka confluent-zookeeper datastax-dse datastax-ops elastic hdfs kafka-zookeeper dcos-monitoring
