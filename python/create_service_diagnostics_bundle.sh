@@ -10,12 +10,7 @@ readonly VERSION='v0.4.0'
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
 readonly SCRIPT_NAME="create_service_diagnostics_bundle.py"
-readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
 readonly TTY_OPTS="${TTY_OPTS:=-it}"
-DCOS_CLI_AUTO_INIT="yes"
-
-readonly CONTAINER_BUNDLES_DIRECTORY="/${BUNDLES_DIRECTORY}"
-readonly CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
 
 function is_development_mode() {
   [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]
@@ -31,20 +26,9 @@ if is_development_mode; then
   echo "static git checkout"
   echo
   set -x
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics"
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v $(pwd):${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}:ro"
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_DIR_ENV="-e DCOS_SERVICE_DIAGNOSTICS_DIRECTORY=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}"
-else
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics-dist"
-
-  # We don't mount the /dcos-service-diagnostics directory in the container because the
-  # script will use /dcos-sdk-service-diagnostics-dist which is added to the Docker image during
-  # build time.
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT=
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_DIR_ENV=
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v $(pwd):/dcos-service-diagnostics:ro"
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_WORKDIR="-w /dcos-service-diagnostics"
 fi
-
-readonly CONTAINER_SCRIPT_PATH="${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/${SCRIPT_NAME}"
 
 function version () {
   echo "${VERSION}"
@@ -71,18 +55,18 @@ function container_run () {
   docker run \
          "${TTY_OPTS}" \
          --rm \
-         -v "$(pwd)/${BUNDLES_DIRECTORY}:${CONTAINER_BUNDLES_DIRECTORY}" \
-         -v "${HOST_DCOS_CLI_DIRECTORY}:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
-         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
-         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_DIR_ENV} \
-         -e DCOS_CLI_AUTO_INIT="${DCOS_CLI_AUTO_INIT}" \
+         -v "$(pwd)/${BUNDLES_DIRECTORY}:/${BUNDLES_DIRECTORY}" \
+         -v "${DCOS_DIR:-${HOME}/.dcos}:/dcos-cli-directory":ro \
+         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT:-""} \
+         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_WORKDIR:-""} \
+         -e SKIP_DCOS_CLI_INIT="${SKIP_DCOS_CLI_INIT:-""}" \
          "${DOCKER_IMAGE}" \
          sh -l -c "${command}"
 }
 
 function usage () {
-  DCOS_CLI_AUTO_INIT=""
-  container_run "${CONTAINER_SCRIPT_PATH} --help"
+  SKIP_DCOS_CLI_INIT="yes"
+  container_run "./${SCRIPT_NAME} --help"
 }
 
 if [ "${#}" -eq 1 ] && [[ "${1}" =~ ^(--help|-help|help|--h|-h)$ ]]; then
@@ -90,4 +74,4 @@ if [ "${#}" -eq 1 ] && [[ "${1}" =~ ^(--help|-help|help|--h|-h)$ ]]; then
   exit 0
 fi
 
-container_run "${CONTAINER_SCRIPT_PATH} ${*} --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY}"
+container_run "./${SCRIPT_NAME} ${*} --bundles-directory /${BUNDLES_DIRECTORY}"
