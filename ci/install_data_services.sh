@@ -2,6 +2,7 @@
 set -eu -o pipefail
 
 readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
+#ToDo: Once the image version will be manageble dont forget replace it here.
 docker run \
   -t \
   --rm \
