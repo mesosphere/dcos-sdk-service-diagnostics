@@ -5,6 +5,7 @@ set -eu -o pipefail
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
 
+#ToDo: the image version should be externally managed outside this file.
 readonly VERSION='v0.4.0'
 
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
