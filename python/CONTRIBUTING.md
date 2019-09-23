@@ -41,13 +41,13 @@ Requires AWS S3 credentials.
 
 1. Wait for PR to be merged to master
 
-1. Push a new PR with a `VERSION` bump in
-   `create_service_diagnostics_bundle.sh` and a new
+1. Push a new PR with a `version` bump in
+   `VERSION` file and a new
    `CHANGELOG.md` entry
 
-   `create_service_diagnostics_bundle.sh`:
-   ```bash
-   readonly VERSION='vx.y.z'
+   `VERSION`:
+   ```
+   vx.y.z
    ```
 
    `CHANGELOG.md`:
@@ -90,8 +90,8 @@ Requires AWS S3 credentials.
      git stash
      git checkout master
      git reset --hard upstream/master
-     docker build -t "mesosphere/dcos-sdk-service-diagnostics:${VERSION}" .
-     docker push "mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
+     docker build -t "mesosphere/dcos-sdk-service-diagnostics:$(<VERSION)" .
+     docker push "mesosphere/dcos-sdk-service-diagnostics:$(<VERSION)"
      git checkout -
      git stash pop
      ```
