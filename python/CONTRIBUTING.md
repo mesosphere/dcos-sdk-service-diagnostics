@@ -41,8 +41,7 @@ Requires AWS S3 credentials.
 
 1. Wait for PR to be merged to master
 
-1. Push a new PR with a `version` bump in
-   `VERSION` file and a new
+1. Push a new PR with a `version` bump in the `VERSION` file and a new
    `CHANGELOG.md` entry
 
    `VERSION`:
@@ -52,7 +51,7 @@ Requires AWS S3 credentials.
 
    `CHANGELOG.md`:
    ```markdown
-   ## vx.y.z (YYYY-MM-DD) - Release title
+   ## vx.y.z (YYYY-MM-DD)
    ### New features
        - Foo. (commit URL)
        - Bar. (commit URL)
@@ -97,8 +96,13 @@ Requires AWS S3 credentials.
      ```
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
-   1. Replace `readonly VERSION=${VERSION:-$(<"${SCRIPT_DIRECTORY}"/VERSION)}` with `readonly VERSION=<tag_version>`, where `tag_version` is value from `VERSION` file
-   1. Version bucket
+   1. Write version from `VERSION` file into `create_service_diagnostics_bundle.sh`:
+
+      ```bash
+      sed -i '' "s/^\(readonly VERSION=\).*/\1\"$(<VERSION)\"/" create_service_diagnostics_bundle.sh
+      ```
+
+   1. Upload script to versioned bucket
 
       ```bash
       aws s3 cp \
@@ -107,7 +111,7 @@ Requires AWS S3 credentials.
         "s3://infinity-artifacts/dcos-commons/diagnostics/${VERSION}/create_service_diagnostics_bundle.sh"
       ```
 
-   1. Latest bucket
+   1. Upload script to latest bucket
 
       ```bash
       aws s3 cp \
@@ -115,4 +119,8 @@ Requires AWS S3 credentials.
         ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
       ```
-   1. Revert changes from first step
+   1. Revert version writing in `create_service_diagnostics_bundle.sh`:
+
+      ```bash
+      git checkout create_service_diagnostics_bundle.sh
+      ```
