@@ -102,6 +102,12 @@ Requires AWS S3 credentials.
       sed -i '' "s/^\(readonly VERSION=\).*/\1\"$(<VERSION)\"/" create_service_diagnostics_bundle.sh
       ```
 
+   1. Verify that the version looks good:
+
+      ```bash
+      grep 'readonly VERSION=' create_service_diagnostics_bundle.sh
+      ```
+
    1. Upload script to versioned bucket
 
       ```bash
@@ -119,7 +125,7 @@ Requires AWS S3 credentials.
         ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
       ```
-   1. Revert version writing in `create_service_diagnostics_bundle.sh`:
+   1. Revert version written in `create_service_diagnostics_bundle.sh`:
 
       ```bash
       git checkout create_service_diagnostics_bundle.sh
