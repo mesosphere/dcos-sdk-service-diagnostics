@@ -97,7 +97,7 @@ Requires AWS S3 credentials.
      ```
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
-
+   1. Replace `readonly VERSION=${VERSION:-$(<"${SCRIPT_DIRECTORY}"/VERSION)}` with `readonly VERSION=<tag_version>`, where `tag_version` is value from `VERSION` file
    1. Version bucket
 
       ```bash
@@ -115,3 +115,4 @@ Requires AWS S3 credentials.
         ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
       ```
+   1. Revert changes from first step
