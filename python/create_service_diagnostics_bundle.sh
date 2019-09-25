@@ -5,8 +5,7 @@ set -eu -o pipefail
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
 
-#ToDo: the image version should be externally managed outside this file.
-readonly VERSION='v0.4.0'
+readonly VERSION=${VERSION:-$(<"${SCRIPT_DIRECTORY}"/VERSION)}
 
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
@@ -27,11 +26,11 @@ if is_development_mode; then
   echo "static git checkout"
   echo
   set -x
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v $(pwd):/dcos-service-diagnostics:ro"
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v ${SCRIPT_DIRECTORY}:/dcos-service-diagnostics:ro"
   readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_WORKDIR="-w /dcos-service-diagnostics"
 fi
 
-function version () {
+function version() {
   echo "${VERSION}"
 }
 

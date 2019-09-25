@@ -41,18 +41,17 @@ Requires AWS S3 credentials.
 
 1. Wait for PR to be merged to master
 
-1. Push a new PR with a `VERSION` bump in
-   `create_service_diagnostics_bundle.sh` and a new
+1. Push a new PR with a `version` bump in the `VERSION` file and a new
    `CHANGELOG.md` entry
 
-   `create_service_diagnostics_bundle.sh`:
-   ```bash
-   readonly VERSION='vx.y.z'
+   `VERSION`:
+   ```
+   vx.y.z
    ```
 
    `CHANGELOG.md`:
    ```markdown
-   ## vx.y.z (YYYY-MM-DD) - Release title
+   ## vx.y.z (YYYY-MM-DD)
    ### New features
        - Foo. (commit URL)
        - Bar. (commit URL)
@@ -90,15 +89,26 @@ Requires AWS S3 credentials.
      git stash
      git checkout master
      git reset --hard upstream/master
-     docker build -t "mesosphere/dcos-sdk-service-diagnostics:${VERSION}" .
-     docker push "mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
+     docker build -t "mesosphere/dcos-sdk-service-diagnostics:$(<VERSION)" .
+     docker push "mesosphere/dcos-sdk-service-diagnostics:$(<VERSION)"
      git checkout -
      git stash pop
      ```
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
+   1. Write version from `VERSION` file into `create_service_diagnostics_bundle.sh`:
 
-   1. Version bucket
+      ```bash
+      sed -i '' "s/^\(readonly VERSION=\).*/\1\"$(<VERSION)\"/" create_service_diagnostics_bundle.sh
+      ```
+
+   1. Verify that the version looks good:
+
+      ```bash
+      grep 'readonly VERSION=' create_service_diagnostics_bundle.sh
+      ```
+
+   1. Upload script to versioned bucket
 
       ```bash
       aws s3 cp \
@@ -107,11 +117,16 @@ Requires AWS S3 credentials.
         "s3://infinity-artifacts/dcos-commons/diagnostics/${VERSION}/create_service_diagnostics_bundle.sh"
       ```
 
-   1. Latest bucket
+   1. Upload script to latest bucket
 
       ```bash
       aws s3 cp \
         --acl=public-read \
         ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
+      ```
+   1. Revert version written in `create_service_diagnostics_bundle.sh`:
+
+      ```bash
+      git checkout create_service_diagnostics_bundle.sh
       ```
