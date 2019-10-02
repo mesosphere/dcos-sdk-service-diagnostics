@@ -5,7 +5,7 @@ set -eu -o pipefail
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
 
-readonly VERSION='v0.4.0'
+readonly VERSION="$(cat "$SCRIPT_DIRECTORY/VERSION" | head -1)"
 
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
@@ -110,5 +110,4 @@ container_run "rm -rf ${CONTAINER_DCOS_CLI_DIRECTORY} && mkdir ${CONTAINER_DCOS_
                  -exec cp --parents \{\} ${CONTAINER_DCOS_CLI_DIRECTORY} \;
                cd /
                dcos plugin add /tmp/dcos-core-cli-${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.zip
-               ${CONTAINER_SCRIPT_PATH} ${*} --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY} \
-               --service_diagnostics_version ${VERSION}"
+               ${CONTAINER_SCRIPT_PATH} ${*} --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY}"

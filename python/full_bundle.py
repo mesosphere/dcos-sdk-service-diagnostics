@@ -21,6 +21,7 @@ DCOS_VERSION_FILE_NAME = "dcos_version.txt"
 
 SERVICE_DIAGNOSTICS_VERSION_FILE_NAME = "dcos_service_diagnostics_version.txt"
 
+
 @config.retry
 def get_dcos_services() -> (bool, str):
     rc, stdout, stderr = sdk_cmd.run_cli(
@@ -130,7 +131,7 @@ class FullBundle(Bundle):
         self.write_file(DCOS_VERSION_FILE_NAME, self.dcos_version)
 
         logging.info("Service diagnostics script version: {}".format(self.service_diagnostics_version))
-        self.write_file(SERVICE_DIAGNOSTIC_VERSION_FILE_NAME, self.service_diagnostics_version)
+        self.write_file(SERVICE_DIAGNOSTICS_VERSION_FILE_NAME, self.service_diagnostics_version)
 
         all_services = json.loads(all_services_or_error)
 
@@ -147,14 +148,14 @@ class FullBundle(Bundle):
             return 1, self
 
         if len(active_services) > 1:
-            log.warn("More than one active service named '%s'", self.service_name)
+            log.warning("More than one active service named '%s'", self.service_name)
 
         active_service = active_services[0]
 
         marathon_services = [s for s in all_services if service_names_match("marathon", s.get("name"))]
         # TODO: handle the possibility of having no active Marathon services?
         if len(marathon_services) > 1:
-            log.warn("More than one marathon services: %s", len(marathon_services))
+            log.warning("More than one marathon services: %s", len(marathon_services))
 
         active_marathon_services = [s for s in marathon_services if is_service_active(s)]
         # TODO: handle the possibility of having more than one Marathon service?
@@ -167,7 +168,7 @@ class FullBundle(Bundle):
             if is_service_scheduler_task(self.package_name, self.service_name, t)
         ]
         if not scheduler_tasks:
-            log.warn(
+            log.warning(
                 "Could not find scheduler tasks for '%s' under the Marathon service ('\"name\": \"marathon\"') 'tasks' key in '%s'.",
                 self.service_name,
                 DCOS_SERVICES_JSON_FILE_NAME,
@@ -182,10 +183,9 @@ class FullBundle(Bundle):
 
         log.info("Completed creating service-level diagnostics.")
 
-        # Find and dispatch to the appropriate BaseTechBundle.
         # If nothing is found run the BaseTechBundle
-        BaseTechBundle = base_tech.get_bundle_class(self.package_name)
-        BaseTechBundle(
+        base_tech_bundle = base_tech.get_bundle_class(self.package_name)
+        base_tech_bundle(
             self.package_name,
             self.service_name,
             scheduler_tasks,
