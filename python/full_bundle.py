@@ -19,7 +19,7 @@ DCOS_SERVICES_JSON_FILE_NAME = "dcos_services.json"
 
 DCOS_VERSION_FILE_NAME = "dcos_version.txt"
 
-SERVICE_DIAGNOSTIC_VERSION_FILE_NAME = "dcos_service_diagnostics_version.txt"
+SERVICE_DIAGNOSTICS_VERSION_FILE_NAME = "dcos_service_diagnostics_version.txt"
 
 @config.retry
 def get_dcos_services() -> (bool, str):
