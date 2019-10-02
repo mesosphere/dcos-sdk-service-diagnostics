@@ -129,7 +129,7 @@ class FullBundle(Bundle):
         logging.info("DC/OS version: {}".format(self.dcos_version))
         self.write_file(DCOS_VERSION_FILE_NAME, self.dcos_version)
 
-        logging.info("Service diagnostic version: {}".format(self.service_diagnostics_version))
+        logging.info("Service diagnostics script version: {}".format(self.service_diagnostics_version))
         self.write_file(SERVICE_DIAGNOSTIC_VERSION_FILE_NAME, self.service_diagnostics_version)
 
         all_services = json.loads(all_services_or_error)
