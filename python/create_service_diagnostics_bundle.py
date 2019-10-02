@@ -140,7 +140,7 @@ def parse_args() -> dict:
         type=str,
         required=True,
         default=None,
-        help="Diagnostic service version."
+        help="Service diagnostics script version."
     )
 
     return parser.parse_args()
