@@ -135,6 +135,14 @@ def parse_args() -> dict:
         help="Disable interactive mode and assume 'yes' is the answer to all prompts.",
     )
 
+    parser.add_argument(
+        "--service_diagnostics_version",
+        type=str,
+        required=True,
+        default=None,
+        help="Diagnostic service version."
+    )
+
     return parser.parse_args()
 
 
@@ -204,6 +212,7 @@ def preflight_check() -> (int, dict):
             "dcos_version": cluster["version"],
             "cluster_url": cluster["url"],
             "should_prompt_user": should_prompt_user,
+            "service_diagnostics_version": args.service_diagnostics_version,
         },
     )
 
@@ -213,11 +222,12 @@ def main(argv) -> int:
     if rc != 0:
         return rc
 
+    dcos_version = args.get("dcos_version")
     print("\nWill create bundle for:")
     print("  Package:         {}".format(args.get("package_name")))
     print("  Package version: {}".format(args.get("package_version")))
     print("  Service name:    {}".format(args.get("service_name")))
-    print("  DC/OS version:   {}".format(args.get("dcos_version")))
+    print("  DC/OS version:   {}".format(dcos_version))
     print("  Cluster URL:     {}".format(args.get("cluster_url")))
 
     if args.get("should_prompt_user"):
@@ -226,7 +236,8 @@ def main(argv) -> int:
             return 0
 
     rc, _ = FullBundle(
-        args.get("package_name"), args.get("service_name"), args.get("bundles_directory")
+        args.get("package_name"), args.get("service_name"), args.get("bundles_directory"),
+        dcos_version, args.get("service_diagnostics_version")
     ).create()
 
     return rc

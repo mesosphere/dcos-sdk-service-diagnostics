@@ -17,6 +17,9 @@ log = logging.getLogger(__name__)
 
 DCOS_SERVICES_JSON_FILE_NAME = "dcos_services.json"
 
+DCOS_VERSION_FILE_NAME = "dcos_version.txt"
+
+SERVICE_DIAGNOSTIC_VERSION_FILE_NAME = "dcos_service_diagnostics_version.txt"
 
 @config.retry
 def get_dcos_services() -> (bool, str):
@@ -77,11 +80,13 @@ def directory_date_string() -> str:
 
 
 class FullBundle(Bundle):
-    def __init__(self, package_name, service_name, bundles_directory):
+    def __init__(self, package_name, service_name, bundles_directory, dcos_version, service_diagnostics_version):
         self.package_name = package_name
         self.service_name = service_name
         self.bundles_directory = bundles_directory
         self.output_directory = self._create_bundle_directory()
+        self.dcos_version = dcos_version
+        self.service_diagnostics_version = service_diagnostics_version
 
     def _configure_logging(self):
         """Configures logging to write script output to bundle output directory.
@@ -120,6 +125,12 @@ class FullBundle(Bundle):
         if not success:
             log.error(all_services_or_error)
             return 1, self
+
+        logging.info("DC/OS version: {}".format(self.dcos_version))
+        self.write_file(DCOS_VERSION_FILE_NAME, self.dcos_version)
+
+        logging.info("Service diagnostic version: {}".format(self.service_diagnostics_version))
+        self.write_file(SERVICE_DIAGNOSTIC_VERSION_FILE_NAME, self.service_diagnostics_version)
 
         all_services = json.loads(all_services_or_error)
 
