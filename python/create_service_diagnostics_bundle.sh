@@ -5,7 +5,7 @@ set -eu -o pipefail
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
 
-readonly VERSION="$(cat "$SCRIPT_DIRECTORY/VERSION" | head -1)"
+readonly VERSION="$(head -1 < "$SCRIPT_DIRECTORY/VERSION")"
 
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"

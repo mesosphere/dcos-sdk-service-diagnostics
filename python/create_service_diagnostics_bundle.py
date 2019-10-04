@@ -6,7 +6,7 @@
 import argparse
 import json
 import logging
-import os
+from os import path
 import sys
 
 from full_bundle import FullBundle
@@ -55,7 +55,6 @@ def parse_args() -> argparse.Namespace:
 class ConfigurationException(Exception):
     def __init__(self, msg, code: int = 1):
         super().__init__(msg)
-        log.error(msg)
         self._code = code
 
     @property
@@ -68,15 +67,17 @@ class Configuration:
     def __init__(self):
         self._cluster_name = None
         self._clusters = None
-        self._package_name = None
-        self._service_name = None
-        self._bundles_directory = None
-        self._should_prompt_user = None
         self._package_version = None
         self._dcos_version = None
         self._cluster_url = None
         self._marathon_app = None
         self._service_diagnostics_version = None
+
+        args = parse_args()
+        self._package_name = args.package_name
+        self._service_name = args.service_name
+        self._bundles_directory = args.bundles_directory
+        self._should_prompt_user = not args.yes
 
     @staticmethod
     def get_cluster_name() -> str:
@@ -134,7 +135,7 @@ class Configuration:
                 stdout,
             )
             log.info(
-                "Maybe the '%s' scheduler is not running. That's ok, " +
+                "The '%s' scheduler might not be running. That's ok, " +
                 "we can still try to fetch any artifacts related to it",
                 service_name,
             )
@@ -157,16 +158,16 @@ class Configuration:
             log.info("Try '--package-name=%s'", package_name)
             raise ConfigurationException(err)
 
-    def check_cluster_state(self):
+    def check_attached_cluster(self):
         print("Checking attached DC/OS cluster state...")
 
-        clusters = self.clusters
-        if len(clusters) == 1:
+        if len(self.clusters) == 1:
+            log.info("Attached.")
             return
-        elif len(clusters) == 0:
+        elif len(self.clusters) == 0:
             err = "No cluster is attached"
         else:
-            err = "More than one attached clusters"
+            err = "More than one attached cluster"
         raise ConfigurationException(err)
 
     def check_authentication(self):
@@ -175,21 +176,13 @@ class Configuration:
         rc, stdout, stderr = sdk_cmd.run_cli("service", print_output=False)
 
         if rc == 0:
-            log.info("Authenticated")
+            log.info("Authenticated.")
             return
 
         err = "Unexpected error\nstdout: '{}'\nstderr: '{}'".format(stdout, stderr)
         if any(s in stderr for s in ("dcos auth login", "Missing required config parameter")):
             err = "Not authenticated to {}. Please run `dcos auth login`".format(self.cluster_name)
         raise ConfigurationException(err)
-
-    def load_args(self):
-        args = parse_args()
-
-        self._package_name = args.package_name
-        self._service_name = args.service_name
-        self._bundles_directory = args.bundles_directory
-        self._should_prompt_user = not args.yes
 
     @property
     def cluster_name(self) -> str:
@@ -216,30 +209,18 @@ class Configuration:
 
     @property
     def package_name(self) -> str:
-        if self._package_name is None:
-            self.load_args()
-
         return self._package_name
 
     @property
     def service_name(self) -> str:
-        if self._service_name is None:
-            self.load_args()
-
         return self._service_name
 
     @property
     def bundles_directory(self) -> str:
-        if self._bundles_directory is None:
-            self.load_args()
-
         return self._bundles_directory
 
     @property
     def should_prompt_user(self) -> bool:
-        if self._should_prompt_user is None:
-            self.load_args()
-
         return self._should_prompt_user
 
     @property
@@ -268,10 +249,9 @@ class Configuration:
     @property
     def service_diagnostics_version(self) -> str:
         if self._service_diagnostics_version is None:
-            __location__ = os.path.realpath(
-                os.path.join(os.getcwd(), os.path.dirname(__file__)))
+            location = path.realpath(path.dirname(__file__))
 
-            with open(os.path.join(__location__, 'VERSION'), 'r') as f:
+            with open(path.join(location, 'VERSION'), 'r') as f:
                 self._service_diagnostics_version = f.readline()
 
         return self._service_diagnostics_version
@@ -281,7 +261,7 @@ def main() -> int:
     try:
         config = Configuration()
         config.check_authentication()
-        config.check_cluster_state()
+        config.check_attached_cluster()
 
         s = "  {:18}{}"
         print("Will create bundle for:")
@@ -303,6 +283,7 @@ def main() -> int:
 
         return rc
     except ConfigurationException as e:
+        log.error(str(e))
         return e.code
 
 
