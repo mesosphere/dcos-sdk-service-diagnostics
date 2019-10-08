@@ -5,7 +5,7 @@ set -eu -o pipefail
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
 
-readonly VERSION='v0.4.0'
+readonly VERSION='v0.4.1'
 
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
@@ -96,7 +96,8 @@ readonly SUPPORTED_DCOS_VERSIONS="
 1.11
 1.12
 1.13
-1.14"
+1.14
+2.0"
 if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_MINOR_VERSION}"; then
   echo "DC/OS ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.x is not supported by this tool."
   echo "Supported DC/OS versions: ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}."
