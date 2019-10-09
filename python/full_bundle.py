@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from datetime import date, datetime
 from typing import List
 import json
@@ -80,14 +81,41 @@ def directory_date_string() -> str:
     return date.strftime(datetime.utcnow(), "%Y%m%dT%H%M%SZ")
 
 
+class BaseBundleConfiguration(ABC):
+    @property
+    @abstractmethod
+    def package_name(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def service_name(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def bundles_directory(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def dcos_version(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def service_diagnostics_version(self):
+        raise NotImplementedError
+
+
 class FullBundle(Bundle):
-    def __init__(self, package_name, service_name, bundles_directory, dcos_version, service_diagnostics_version):
-        self.package_name = package_name
-        self.service_name = service_name
-        self.bundles_directory = bundles_directory
+    def __init__(self, conf: BaseBundleConfiguration):
+        self.package_name = conf.package_name
+        self.service_name = conf.service_name
+        self.bundles_directory = conf.bundles_directory
         self.output_directory = self._create_bundle_directory()
-        self.dcos_version = dcos_version
-        self.service_diagnostics_version = service_diagnostics_version
+        self.dcos_version = conf.dcos_version
+        self.service_diagnostics_version = conf.service_diagnostics_version
 
     def _configure_logging(self):
         """Configures logging to write script output to bundle output directory.
