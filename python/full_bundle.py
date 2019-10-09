@@ -211,6 +211,7 @@ class FullBundle(Bundle):
 
         log.info("Completed creating service-level diagnostics.")
 
+        # Find and dispatch to the appropriate BaseTechBundle.
         # If nothing is found run the BaseTechBundle
         base_tech_bundle = base_tech.get_bundle_class(self.package_name)
         base_tech_bundle(
