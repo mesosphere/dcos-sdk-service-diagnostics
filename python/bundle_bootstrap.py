@@ -249,10 +249,13 @@ class Bootstrap(BaseBundleConfiguration):
         if self._service_diagnostics_version is None:
             location = path.realpath(path.dirname(__file__))
             cmd = '{} -v | grep "^[^+]" | tail -1'.format(
-                path.join(location, 'create_service_diagnostics_bundle.sh')
+                path.join(location, 'create_service_diagnostics_bundle1.sh')
             )
 
             rc, stdout, stderr = sdk_cmd._run_cmd(cmd, print_output=False, check=False)
+
+            if str(stderr) != "":
+                raise BootstrapException(stderr)
 
             self._service_diagnostics_version = stdout
 
