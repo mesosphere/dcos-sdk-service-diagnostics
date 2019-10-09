@@ -3,7 +3,6 @@
 ## v0.5.0 (2019-10-09)
 
 ### New features
-
    - Gather versions of DC/OS cluster and the diagnostics script itself.
    ([PR #17](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/17))
 
