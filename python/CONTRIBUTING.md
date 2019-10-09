@@ -41,27 +41,21 @@ Requires AWS S3 credentials.
 
 1. Wait for PR to be merged to master
 
-1. Push a new PR with a `VERSION` bump in
-   `create_service_diagnostics_bundle.sh` and a new
-   `CHANGELOG.md` entry
-
-   `create_service_diagnostics_bundle.sh`:
-   ```bash
-   readonly VERSION='vx.y.z'
-   ```
+1. Push a new PR with a version bump in the `VERSION` file
+   and a new `CHANGELOG.md` entry
 
    `CHANGELOG.md`:
    ```markdown
-   ## vx.y.z (YYYY-MM-DD) - Release title
+   ## vx.y.z (YYYY-MM-DD)
    ### New features
        - Foo. (commit URL)
        - Bar. (commit URL)
-   ### Bug fixes
-       - Baz. (commit URL)
-       - Qux. (commit URL)
    ### Improvements
        - Quux. (commit URL)
        - Quuz. (commit URL)
+   ### Bug fixes
+       - Baz. (commit URL)
+       - Qux. (commit URL)
    ```
 
 1. Wait for PR to be merged to master
@@ -115,3 +109,5 @@ Requires AWS S3 credentials.
         ./create_service_diagnostics_bundle.sh \
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
       ```
+
+1. Mention the new release on the #data-services D2iQ slack channel.
