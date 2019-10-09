@@ -1,5 +1,4 @@
-ARG base_image=python:3.7.3-slim
-FROM $base_image
+FROM python:3.7.3-slim
 
 # dcos-cli and lint tooling require this to output cleanly
 ENV LC_ALL=C.UTF-8 LANG=C.UTF-8
