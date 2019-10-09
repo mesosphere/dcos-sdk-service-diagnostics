@@ -110,4 +110,4 @@ Requires AWS S3 credentials.
         "s3://infinity-artifacts/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh"
       ```
 
-1. Mention the new release on the #data-services D2iQ slack channel.
+1. Mention the new release on the #eng-data-services D2iQ slack channel.
