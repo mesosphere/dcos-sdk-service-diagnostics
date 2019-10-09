@@ -254,4 +254,6 @@ class Bootstrap(BaseBundleConfiguration):
 
             rc, stdout, stderr = sdk_cmd._run_cmd(cmd, print_output=False, check=False)
 
-            return stdout
+            self._service_diagnostics_version = stdout
+
+        return self._service_diagnostics_version
