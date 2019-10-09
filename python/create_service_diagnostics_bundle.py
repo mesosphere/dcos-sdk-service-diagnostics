@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Dependencies:
-# - DC/OS CLI (specified in requirement.txt)
+# - DC/OS CLI (specified in Pipfile)
 
 import logging
 import sys
