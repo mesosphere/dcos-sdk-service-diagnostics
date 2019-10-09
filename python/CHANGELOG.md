@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v0.5.0 (2019-10-09)
+
+### New features
+   - Gather versions of DC/OS cluster and the diagnostics script itself.
+   ([PR #17](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/17))
+
+### Improvements
+   - Support the `$DCOS_DIR` environment variable.
+   ([PR #12](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/12))
+   - Make it possible to run the script without a controlling terminal.
+   ([PR #13](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/13))
+   - Gather more diagnostics when running against an Elastic package.
+   ([PR #14](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/14))
+
 ## v0.4.0 (2019-08-29)
 
 ### New features
