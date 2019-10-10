@@ -41,8 +41,14 @@ Requires AWS S3 credentials.
 
 1. Wait for PR to be merged to master
 
-1. Push a new PR with a version bump in the `VERSION` file
-   and a new `CHANGELOG.md` entry
+1. Push a new PR with a `VERSION` bump in
+   `create_service_diagnostics_bundle.sh` and a new
+   `CHANGELOG.md` entry
+
+   `create_service_diagnostics_bundle.sh`:
+   ```bash
+   readonly VERSION='vx.y.z'
+   ```
 
    `CHANGELOG.md`:
    ```markdown

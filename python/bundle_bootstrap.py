@@ -6,7 +6,6 @@
 
 import argparse
 import json
-from os import path
 
 import sdk_cmd
 
@@ -47,6 +46,12 @@ def parse_args() -> argparse.Namespace:
         help="Disable interactive mode and assume 'yes' is the answer to all prompts.",
     )
 
+    parser.add_argument(
+        "--diagnostics-version",
+        required=True,
+        help="Service diagnostics version.",
+    )
+
     return parser.parse_args()
 
 
@@ -69,13 +74,13 @@ class Bootstrap(BaseBundleConfiguration):
         self._dcos_version = None
         self._cluster_url = None
         self._marathon_app = None
-        self._service_diagnostics_version = None
 
         args = parse_args()
         self._package_name = args.package_name
         self._service_name = args.service_name
         self._bundles_directory = args.bundles_directory
         self._should_prompt_user = not args.yes
+        self._service_diagnostics_version = args.diagnostics_version
 
         self.logger = logger
 
@@ -246,10 +251,4 @@ class Bootstrap(BaseBundleConfiguration):
 
     @property
     def service_diagnostics_version(self) -> str:
-        if self._service_diagnostics_version is None:
-            location = path.realpath(path.dirname(__file__))
-
-            with open(path.join(location, 'VERSION'), 'r') as f:
-                self._service_diagnostics_version = f.readline()
-
         return self._service_diagnostics_version
