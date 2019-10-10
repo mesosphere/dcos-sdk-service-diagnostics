@@ -6,7 +6,6 @@
 
 import argparse
 import json
-from os import path
 
 import sdk_cmd
 
