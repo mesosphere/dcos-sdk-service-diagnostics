@@ -100,7 +100,7 @@ readonly SUPPORTED_DCOS_VERSIONS="
 2.0"
 if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_MINOR_VERSION}"; then
   echo "DC/OS ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.x is not supported by this tool."
-  echo "Supported DC/OS versions: ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}."
+  echo "Supported DC/OS versions: ${SUPPORTED_DCOS_VERSIONS}"
   exit 1
 fi
 
