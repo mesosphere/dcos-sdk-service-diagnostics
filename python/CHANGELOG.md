@@ -6,6 +6,10 @@
    - Added support for DC/OS 2.0 clusters.
    ([PR #22](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/22))
 
+### Bug fixes
+   - When displaying a message after encountering an unsupported DC/OS version,
+   claim the correct list of supported versions ([PR #24](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/24))
+
 ## v0.5.0 (2019-10-09)
 
 ### New features
