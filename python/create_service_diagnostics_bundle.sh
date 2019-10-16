@@ -10,12 +10,7 @@ readonly VERSION='v0.7.0'
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
 readonly SCRIPT_NAME="create_service_diagnostics_bundle.py"
-readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
 readonly TTY_OPTS="${TTY_OPTS:=-it}"
-
-readonly CONTAINER_BUNDLES_DIRECTORY="/${BUNDLES_DIRECTORY}"
-readonly CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
-readonly CONTAINER_DCOS_CLI_DIRECTORY="/root/.dcos"
 
 function is_development_mode() {
   [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]
@@ -31,18 +26,9 @@ if is_development_mode; then
   echo "static git checkout"
   echo
   set -x
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics"
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v $(pwd):${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}:ro"
-else
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics-dist"
-
-  # We don't mount the /dcos-service-diagnostics directory in the container because the
-  # script will use /dcos-sdk-service-diagnostics-dist which is added to the Docker image during
-  # build time.
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT=
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v ${SCRIPT_DIRECTORY}:/dcos-service-diagnostics:ro"
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_WORKDIR="-w /dcos-service-diagnostics"
 fi
-
-readonly CONTAINER_SCRIPT_PATH="${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/${SCRIPT_NAME}"
 
 function version() {
   echo "${VERSION}"
@@ -69,16 +55,18 @@ function container_run () {
   docker run \
          "${TTY_OPTS}" \
          --rm \
-         -v "$(pwd)/${BUNDLES_DIRECTORY}:${CONTAINER_BUNDLES_DIRECTORY}" \
-         -v "${HOST_DCOS_CLI_DIRECTORY}:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
-         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
-         -e PYTHONPATH=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY} \
+         -v "$(pwd)/${BUNDLES_DIRECTORY}:/${BUNDLES_DIRECTORY}" \
+         -v "${DCOS_DIR:-${HOME}/.dcos}:/dcos-cli-directory":ro \
+         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT:-""} \
+         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_WORKDIR:-""} \
+         -e SKIP_DCOS_CLI_INIT="${SKIP_DCOS_CLI_INIT:-""}" \
          "${DOCKER_IMAGE}" \
          sh -l -c "${command}"
 }
 
 function usage () {
-  container_run "${CONTAINER_SCRIPT_PATH} --help"
+  SKIP_DCOS_CLI_INIT="yes"
+  container_run "./${SCRIPT_NAME} --help"
 }
 
 if [ "${#}" -eq 1 ] && [[ "${1}" =~ ^(--help|-help|help|--h|-h)$ ]]; then
@@ -86,32 +74,4 @@ if [ "${#}" -eq 1 ] && [[ "${1}" =~ ^(--help|-help|help|--h|-h)$ ]]; then
   exit 0
 fi
 
-echo "Initializing diagnostics..."
-
-DCOS_CLUSTER_MAJOR_MINOR_VERSION=$(dcos --version | awk -F"=" '/^dcos.version=/ {split($2,verPart,".");print verPart[1]"."verPart[2]}')
-echo "Detected attached DC/OS cluster major and minor version as '${DCOS_CLUSTER_MAJOR_MINOR_VERSION}'"
-
-readonly SUPPORTED_DCOS_VERSIONS="
-1.10
-1.11
-1.12
-1.13
-1.14
-2.0
-2.1"
-if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_MINOR_VERSION}"; then
-  echo "DC/OS ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.x is not supported by this tool."
-  echo "Supported DC/OS versions: ${SUPPORTED_DCOS_VERSIONS}"
-  exit 1
-fi
-
-container_run "rm -rf ${CONTAINER_DCOS_CLI_DIRECTORY} && mkdir ${CONTAINER_DCOS_CLI_DIRECTORY}
-               cd ${CONTAINER_DCOS_CLI_DIRECTORY_RO}
-               find . \
-                 \( -name 'dcos.toml' -or -name 'attached' \) \
-                 -exec cp --parents \{\} ${CONTAINER_DCOS_CLI_DIRECTORY} \;
-               cd /
-               dcos plugin add /tmp/dcos-core-cli-${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.zip
-               ${CONTAINER_SCRIPT_PATH} ${*} \
-               --bundles-directory ${CONTAINER_BUNDLES_DIRECTORY} \
-               --diagnostics-version ${VERSION}"
+container_run "./${SCRIPT_NAME} ${*} --bundles-directory /${BUNDLES_DIRECTORY}"
