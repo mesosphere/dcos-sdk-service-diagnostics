@@ -68,10 +68,44 @@ Requires AWS S3 credentials.
 
 1. Build and publish Docker image tagged with the desired version
 
+   - With the [Jenkins job](https://jenkins.mesosphere.com/service/jenkins/view/Infinity/job/infinity-tools/job/release-tools/job/build-docker-image)
+
+     Make sure to set `IMAGE_TAG` correctly. For example, if `VERSION` is
+     `v0.3.1`, `IMAGE_TAG` should be `v0.3.1`.
+
+     | Parameter          | Value                        |
+     | ------------------ | ---------------------------- |
+     | `DOCKER_FILE_PATH` | python/Dockerfile            |
+     | `DOCKER_ORG`       | mesosphere                   |
+     | `IMAGE_TAG`        | `$VERSION`            |
+     | `IMAGE_NAME`       | dcos-sdk-service-diagnostics |
+     | `GITHUB_ORG`       | mesosphere                   |
+     | `GITHUB_REPO`      | dcos-sdk-service-diagnostics |
+     | `GIT_REF`          | master                       |
+
+   - Or manually
+
+     ```bash
+     git fetch upstream
+     git stash
+     git checkout master
+     git reset --hard upstream/master
+     docker build -t "mesosphere/dcos-sdk-service-diagnostics:$(<VERSION)" .
+     docker push "mesosphere/dcos-sdk-service-diagnostics:$(<VERSION)"
+     git checkout -
+     git stash pop
+     ```
    - With the [Jenkins job](https://jenkins.mesosphere.com/service/jenkins/view/Infinity/job/infinity-tools/job/release-tools/job/build-docker-image/parambuild/?delay=0sec&DOCKER_FILE_PATH=python/Dockerfile&DOCKER_ORG=mesosphere&IMAGE_NAME=dcos-sdk-service-diagnostics&GITHUB_ORG=mesosphere&GITHUB_REPO=dcos-sdk-service-diagnostics&GIT_REF=master&IMAGE_TAG=REPLACE_THIS_WITH_JUST_vX.Y.Z) - this link pre-populates all fields to correct values, except for `IMAGE_TAG`. Make sure you set it to the same value as you set in the previous step.
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
 
+   1. Verify that the version looks good:
+
+      ```bash
+      grep 'readonly VERSION=' create_service_diagnostics_bundle.sh
+      ```
+
+   1. Upload script to versioned bucket
    1. Make sure you are in the [correct directory](.)!
 
    1. Version bucket

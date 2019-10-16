@@ -44,7 +44,7 @@ fi
 
 readonly CONTAINER_SCRIPT_PATH="${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/${SCRIPT_NAME}"
 
-function version () {
+function version() {
   echo "${VERSION}"
 }
 
