@@ -58,16 +58,15 @@ fi
 # ###
 function run_container() {
   # run python diagnostic script as a processes in isolated container
-  local -r command="${*:-}"
 
   # Docker process configuration
-  readonly TTY_OPTS="${TTY_OPTS:=-it}"
-  readonly DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
+  local TTY_OPTS="${TTY_OPTS:=-it}"
+  local DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
 
   # Docker volumes configuration
-  readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
-  readonly CONTAINER_BUNDLES_DIRECTORY="/${BUNDLES_DIRECTORY}"
-  readonly CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
+  local HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
+  local CONTAINER_BUNDLES_DIRECTORY="/${BUNDLES_DIRECTORY}"
+  local CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
 
   docker run \
          "${TTY_OPTS}" \
@@ -77,7 +76,7 @@ function run_container() {
          ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
          -e PYTHONPATH=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY} \
          "${DOCKER_IMAGE}" \
-         sh -l -c "${command}"
+         sh -l -c "${*:-}"
 }
 
 function show_version() {

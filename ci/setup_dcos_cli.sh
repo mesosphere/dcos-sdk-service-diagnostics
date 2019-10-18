@@ -43,7 +43,7 @@ export DCOS_DIR
 echo "##teamcity[setParameter name='env.DCOS_DIR' value='${DCOS_DIR}']"
 
 # ###
-# 3. section: Setup DC/OS cluster
+# 2. section: Setup DC/OS cluster
 # ###
 echo "Setup the cluster with dcos-cli - " "${CLUSTER_URL}"
 dcos cluster setup \
