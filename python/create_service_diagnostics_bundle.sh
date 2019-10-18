@@ -87,8 +87,7 @@ function show_version() {
 
 function show_usage() {
   # Show help for create_service_diagnostics_bundle.py
-  run_container "./${PYTHON_SCRIPT_NAME} --skip-init --help"
-
+  run_container "./${PYTHON_SCRIPT_NAME} --help"
 }
 
 # ###
@@ -103,6 +102,7 @@ if [ "${#}" -eq 1 ]; then
         --help|-help|help|--h|-h)
             show_usage
             exit 0
+            ;;
     esac
 fi
 
