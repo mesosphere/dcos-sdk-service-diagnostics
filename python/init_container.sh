@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-if [ -z "${SKIP_DCOS_CLI_INIT}" ]; then
-  echo "Initializing diagnostics..."
+# ###
+# 1. section: Define functions
+# ###
+function initialize() {
+  echo "Initializing diagnostics...";
 
   rm -rf /root/.dcos && mkdir /root/.dcos
   pushd "$(pwd)" || exit
@@ -27,6 +30,22 @@ if [ -z "${SKIP_DCOS_CLI_INIT}" ]; then
   fi
 
   dcos plugin add /tmp/dcos-core-cli-"${DCOS_CLUSTER_MAJOR_MINOR_VERSION}".zip
-fi
+}
+
+function is_help() {
+    # Check is help mode
+    if [ "${#}" -eq 1 ]; then
+        case "$1" in
+            --help|-help|help|--h|-h)
+                echo "YES"
+                ;;
+        esac
+    fi
+}
+
+# ###
+# 2. section: Main script execution
+# ###
+if [ -z "$(is_help $@)" ]; then initialize; fi
 
 exec "$@"

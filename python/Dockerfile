@@ -11,8 +11,6 @@ COPY *.py *.sh Pipfile Pipfile.lock ./
 
 ENV PYTHONPATH=./dcos-commons/testing:./
 
-RUN ls -la ./
-
 ARG dcos_cli_version=1.1.2
 ADD https://downloads.dcos.io/binaries/cli/linux/x86-64/$dcos_cli_version/dcos /usr/local/bin/dcos
 RUN chmod +x /usr/local/bin/dcos
