@@ -24,12 +24,11 @@ fi
 DCOS_USERNAME="$1"
 DCOS_PASSWORD="$2"
 
-
 # ###
-# 1. section: Prepare DC/OS CLI
+# 2. section: Prepare DC/OS CLI
 # ###
 mkdir ./bin
-# Assume that we will use only linux x86-64
+# Assume that script will be executed from linux x86-64 OS
 curl -o ./bin/dcos https://downloads.dcos.io/binaries/cli/linux/x86-64/0.8.0/dcos
 chmod +x ./bin/dcos
 
@@ -43,7 +42,7 @@ export DCOS_DIR
 echo "##teamcity[setParameter name='env.DCOS_DIR' value='${DCOS_DIR}']"
 
 # ###
-# 2. section: Setup DC/OS cluster
+# 3. section: Setup DC/OS cluster
 # ###
 echo "Setup the cluster with dcos-cli - " "${CLUSTER_URL}"
 dcos cluster setup \

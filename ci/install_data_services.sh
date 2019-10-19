@@ -27,6 +27,8 @@ function install_service() {
 }
 
 function install_services() {
+  echo "Install DC/OS services: $@"
+
   declare -a PIDS
 
   # Run installation for all services

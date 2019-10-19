@@ -16,6 +16,7 @@ export TTY_OPTS="-t"
 declare -a PIDS
 for service in "$@"; do
     echo "Starting service diagnostics script for ${service}"
+
     "${SCRIPT_DIRECTORY}"/../python/create_service_diagnostics_bundle.sh \
         --package-name="${service}" \
         --service-name="${service}" \
