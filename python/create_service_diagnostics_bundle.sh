@@ -28,34 +28,14 @@ readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/pyth
 readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly PYTHON_SCRIPT_NAME="create_service_diagnostics_bundle.py"
 
-if [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]; then
-  # Apply if is development mode.
-  echo "dcos-sdk-service-diagnostics repository detected,"
-  echo "running in development mode"
-  echo
-  echo "In development mode all Python modules will be picked up from your"
-  echo "current dcos-sdk-service-diagnostics repository instead of the Docker"
-  echo "image's /dcos-sdk-service-diagnostics-dist directory that contains a"
-  echo "static git checkout"
-  echo
-
-  # Print a trace of simple commands.
-  set -x
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics"
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v ${SCRIPT_DIRECTORY}:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}:ro"
-else
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics-dist"
-
-  # We don't mount the /dcos-service-diagnostics directory in the container because the
-  # script will use /dcos-sdk-service-diagnostics-dist which is added to the Docker image during
-  # build time.
-  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT=
-fi
-
 # ###
 # 3. section: Define functions.
 # ###
-function container_run() {
+function is_development_mode() {
+  [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]
+}
+
+function run_in_container() {
   local TTY_OPTS="${TTY_OPTS:=-it}"
   local DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
 
@@ -82,11 +62,39 @@ function show_version() {
 
 function show_usage() {
   # Show usage instructions.
-  container_run "./${PYTHON_SCRIPT_NAME} --help"
+  run_in_container "./${PYTHON_SCRIPT_NAME} --help"
 }
 
 # ###
-# 4. section: Main script execution.
+# 4. section: Defining additional variables dependent on runtime mode.
+# ###
+if is_development_mode; then
+  # Apply if is development mode.
+  echo "dcos-sdk-service-diagnostics repository detected,"
+  echo "running in development mode"
+  echo
+  echo "In development mode all Python modules will be picked up from your"
+  echo "current dcos-sdk-service-diagnostics repository instead of the Docker"
+  echo "image's /dcos-sdk-service-diagnostics-dist directory that contains a"
+  echo "static git checkout"
+  echo
+
+  # Print a trace of simple commands.
+  set -x
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics"
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v ${SCRIPT_DIRECTORY}:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}:ro"
+else
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics-dist"
+
+  # We don't mount the /dcos-service-diagnostics directory in the container because the
+  # script will use /dcos-sdk-service-diagnostics-dist which is added to the Docker image during
+  # build time.
+  readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT=
+fi
+
+
+# ###
+# 5. section: Main script execution.
 # ###
 if [ "${#}" -eq 1 ]; then
   case "$1" in
@@ -106,6 +114,6 @@ fi
 
 mkdir -p "${BUNDLES_DIRECTORY}"
 
-container_run "./${PYTHON_SCRIPT_NAME} ${*} \
+run_in_container "./${PYTHON_SCRIPT_NAME} ${*} \
               --bundles-directory /${BUNDLES_DIRECTORY} \
               --diagnostics-version ${VERSION}"
