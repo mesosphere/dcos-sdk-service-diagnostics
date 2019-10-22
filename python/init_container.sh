@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 
+# Exit immediately if a command exits with a non-zero status, or zero if all
+# commands in the pipeline exit successfully.
+set -e
+
 # ###
 # 1. section: Define functions
 # ###
 function initialize() {
-  echo "Initializing diagnostics...";
+  echo "Initializing diagnostics..."
 
   rm -rf /root/.dcos && mkdir /root/.dcos
-  pushd "$(pwd)" || exit
   cd /dcos-cli-directory || exit
   find . \
     \( -name 'dcos.toml' -or -name 'attached' \) \
     -exec cp --parents \{\} /root/.dcos \;
-  popd || exit
+  cd - || exit
 
   DCOS_CLUSTER_MAJOR_MINOR_VERSION=$(dcos --version | awk -F"=" '/^dcos.version=/ {split($2,verPart,".");print verPart[1]"."verPart[2]}')
   echo "Detected attached DC/OS cluster major and minor version as '${DCOS_CLUSTER_MAJOR_MINOR_VERSION}'"

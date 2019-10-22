@@ -35,4 +35,3 @@ RUN pip install --upgrade pip && \
         pipenv install --system
 
 ENTRYPOINT ["./init_container.sh"]
-

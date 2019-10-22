@@ -10,7 +10,7 @@ set -eu -o pipefail
 readonly VERSION='v0.7.0'
 
 # ###
-# 1. section: Check requirements before main execution
+# 1. section: Check requirements before main execution.
 # ###
 readonly REQUIREMENTS=("docker" "dcos")
 
@@ -21,7 +21,7 @@ for requirement in ${REQUIREMENTS[*]}; do
 done
 
 # ###
-# 2. section: Define readonly variables (script configuration)
+# 2. section: Define readonly variables (script configuration).
 # ###
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
@@ -29,6 +29,7 @@ readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly PYTHON_SCRIPT_NAME="create_service_diagnostics_bundle.py"
 
 if [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]; then
+  # Apply if is development mode.
   echo "dcos-sdk-service-diagnostics repository detected,"
   echo "running in development mode"
   echo
@@ -37,10 +38,8 @@ if [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]; then
   echo "image's /dcos-sdk-service-diagnostics-dist directory that contains a"
   echo "static git checkout"
   echo
-  #  echo "To apply any changes in Docker file you need to run"
-  #  echo " docker build -t \"mesosphere/dcos-sdk-service-diagnostics:<script version>\""
 
-  # Print a trace of simple commands
+  # Print a trace of simple commands.
   set -x
   readonly CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY="/dcos-service-diagnostics"
   readonly CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT="-v ${SCRIPT_DIRECTORY}:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}:ro"
@@ -54,12 +53,9 @@ else
 fi
 
 # ###
-# 3. section: Define functions
+# 3. section: Define functions.
 # ###
-function run_container() {
-  # run python diagnostic script as a processes in isolated container
-
-  # Docker process configuration
+function container_run() {
   local TTY_OPTS="${TTY_OPTS:=-it}"
   local DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
 
@@ -69,44 +65,47 @@ function run_container() {
   local CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
 
   docker run \
-         "${TTY_OPTS}" \
-         --rm \
-         -v "$(pwd)/${BUNDLES_DIRECTORY}:${CONTAINER_BUNDLES_DIRECTORY}" \
-         -v "${HOST_DCOS_CLI_DIRECTORY}:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
-         ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
-         -e PYTHONPATH=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY} \
-         "${DOCKER_IMAGE}" \
-         sh -l -c "${*:-}"
+          "${TTY_OPTS}" \
+          --rm \
+          -v "$(pwd)/${BUNDLES_DIRECTORY}:${CONTAINER_BUNDLES_DIRECTORY}" \
+          -v "${HOST_DCOS_CLI_DIRECTORY}:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
+          ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
+          -e PYTHONPATH=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY} \
+          "${DOCKER_IMAGE}" \
+          sh -l -c "${*:-}"
 }
 
 function show_version() {
-  # Print script version
+  # Print script version.
   echo "${VERSION}"
 }
 
 function show_usage() {
-  # Show help for create_service_diagnostics_bundle.py
-  run_container "./${PYTHON_SCRIPT_NAME} --help"
+  # Show usage instructions.
+  container_run "./${PYTHON_SCRIPT_NAME} --help"
 }
 
 # ###
-# 4. section: Main script execution
+# 4. section: Main script execution.
 # ###
 if [ "${#}" -eq 1 ]; then
-    case "$1" in
-        --version|-version|version|--v|-v)
-            show_version
-            exit 0
-            ;;
-        --help|-help|help|--h|-h)
-            show_usage
-            exit 0
-            ;;
-    esac
+  case "$1" in
+    --version|-version|version|--v|-v)
+      show_version
+      exit 0
+      ;;
+    --help|-help|help|--h|-h)
+      show_usage
+      exit 0
+      ;;
+  esac
+elif [ "${#}" -eq 0 ]; then
+  show_usage
+  exit 0
 fi
 
 mkdir -p "${BUNDLES_DIRECTORY}"
 
-run_container "./${PYTHON_SCRIPT_NAME} ${*} \
-               --bundles-directory /${BUNDLES_DIRECTORY} \
-               --diagnostics-version ${VERSION}"
+container_run "./${PYTHON_SCRIPT_NAME} ${*} \
+              --bundles-directory /${BUNDLES_DIRECTORY} \
+              --diagnostics-version ${VERSION}"
