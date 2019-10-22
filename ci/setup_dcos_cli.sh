@@ -7,7 +7,7 @@
 set -eu
 
 # ###
-# 1. section: Check input params and environment.
+# section: Check input params and environment.
 # ###
 if [ -z "${CLUSTER_URL}" ]; then
   echo "Error: DC/OS cluster URL is not specified. Please make sure that the CLUSTER_URL environment variable is exported." >&2
@@ -25,7 +25,7 @@ DCOS_USERNAME="$1"
 DCOS_PASSWORD="$2"
 
 # ###
-# 2. section: Prepare DC/OS CLI.
+# section: Prepare DC/OS CLI.
 # ###
 mkdir ./bin
 # Assume that script will be executed from linux x86-64 OS.
@@ -42,7 +42,7 @@ export DCOS_DIR
 echo "##teamcity[setParameter name='env.DCOS_DIR' value='${DCOS_DIR}']"
 
 # ###
-# 3. section: Setup DC/OS cluster.
+# section: Setup DC/OS cluster.
 # ###
 echo "Setup the cluster with dcos-cli - " "${CLUSTER_URL}"
 dcos cluster setup \

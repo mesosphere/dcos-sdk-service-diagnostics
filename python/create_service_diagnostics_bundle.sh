@@ -10,7 +10,7 @@ set -eu -o pipefail
 readonly VERSION='v0.7.0'
 
 # ###
-# 1. section: Check requirements before main execution.
+# section: Check requirements before main execution.
 # ###
 readonly REQUIREMENTS=("docker" "dcos")
 
@@ -21,7 +21,7 @@ for requirement in ${REQUIREMENTS[*]}; do
 done
 
 # ###
-# 2. section: Define readonly variables (script configuration).
+# section: Define readonly variables (script configuration).
 # ###
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH="dcos-sdk-service-diagnostics/python"
@@ -29,7 +29,7 @@ readonly BUNDLES_DIRECTORY="service-diagnostic-bundles"
 readonly PYTHON_SCRIPT_NAME="create_service_diagnostics_bundle.py"
 
 # ###
-# 3. section: Define functions.
+# section: Define functions.
 # ###
 function is_development_mode() {
   [[ ${SCRIPT_DIRECTORY} = *${DCOS_SERVICE_DIAGNOSTICS_SCRIPT_PATH} ]]
@@ -56,7 +56,6 @@ function run_in_container() {
 }
 
 function show_version() {
-  # Print script version.
   echo "${VERSION}"
 }
 
@@ -66,7 +65,7 @@ function show_usage() {
 }
 
 # ###
-# 4. section: Defining additional variables dependent on runtime mode.
+# section: Defining additional variables dependent on runtime mode.
 # ###
 if is_development_mode; then
   echo "dcos-sdk-service-diagnostics repository detected,"
@@ -93,7 +92,7 @@ fi
 
 
 # ###
-# 5. section: Main script execution.
+# section: Main script execution.
 # ###
 if [ "${#}" -eq 1 ]; then
   case "$1" in

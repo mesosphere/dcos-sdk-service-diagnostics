@@ -4,12 +4,14 @@
 # commands in the pipeline exit successfully.
 set -eu
 
-# ###
-# 1. section: Define script variables.
-# ###
 readonly HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 readonly VERSION=$("${SCRIPT_DIRECTORY}"/../python/create_service_diagnostics_bundle.sh -v | tail -1)
+
+if [ "${#}" -eq 0 ]; then
+  echo "At least one argument required."
+  exit 1
+fi
 
 echo "Run container for data service installation: $@"
 

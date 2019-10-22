@@ -56,8 +56,4 @@ def main(args) -> int:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        log.error("At least one argument required.")
-        sys.exit(1)
-
     sys.exit(main(sys.argv[1:]))

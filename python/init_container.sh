@@ -5,17 +5,18 @@
 set -e
 
 # ###
-# 1. section: Define functions
+# section: Define functions
 # ###
 function initialize() {
   echo "Initializing diagnostics..."
 
   rm -rf /root/.dcos && mkdir /root/.dcos
-  cd /dcos-cli-directory || exit
+
+  cd /dcos-cli-directory
   find . \
     \( -name 'dcos.toml' -or -name 'attached' \) \
     -exec cp --parents \{\} /root/.dcos \;
-  cd - || exit
+  cd -
 
   DCOS_CLUSTER_MAJOR_MINOR_VERSION=$(dcos --version | awk -F"=" '/^dcos.version=/ {split($2,verPart,".");print verPart[1]"."verPart[2]}')
   echo "Detected attached DC/OS cluster major and minor version as '${DCOS_CLUSTER_MAJOR_MINOR_VERSION}'"
@@ -47,7 +48,7 @@ function is_help() {
 }
 
 # ###
-# 2. section: Main script execution
+# section: Main script execution
 # ###
 if [ -z "$(is_help $@)" ]; then initialize; fi
 

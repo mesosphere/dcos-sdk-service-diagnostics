@@ -5,13 +5,13 @@
 set -eu
 
 # ###
-# 1. section: Define script variables.
+# section: Define script variables.
 # ###
 readonly SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 export TTY_OPTS="-t"
 
 # ###
-# 2. section: Run diagnostic for all services.
+# section: Run diagnostic for all services.
 # ###
 declare -a PIDS
 for service in "$@"; do
@@ -27,7 +27,7 @@ for service in "$@"; do
 done
 
 # ###
-# 3. section: Wait for all child processes to finnish and handle error codes.
+# section: Wait for all child processes to finnish and handle error codes.
 # ###
 CODE=0
 for PID in "${!PIDS[@]}"; do
