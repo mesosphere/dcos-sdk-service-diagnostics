@@ -2,7 +2,7 @@
 
 # Exit immediately if a command exits with a non-zero status, or zero if all
 # commands in the pipeline exit successfully.
-set -eu -o pipefail
+set -eu
 
 # ###
 # 1. section: Define script variables.

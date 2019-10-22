@@ -69,7 +69,6 @@ function show_usage() {
 # 4. section: Defining additional variables dependent on runtime mode.
 # ###
 if is_development_mode; then
-  # Apply if is development mode.
   echo "dcos-sdk-service-diagnostics repository detected,"
   echo "running in development mode"
   echo
