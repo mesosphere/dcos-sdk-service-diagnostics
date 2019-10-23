@@ -72,12 +72,6 @@ Requires AWS S3 credentials.
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
 
-   1. Verify that the version looks good:
-
-      ```bash
-      grep 'readonly VERSION=' create_service_diagnostics_bundle.sh
-      ```
-
    1. Upload script to versioned bucket
    1. Make sure you are in the [correct directory](.)!
 

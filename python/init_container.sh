@@ -2,7 +2,7 @@
 
 # Exit immediately if a command exits with a non-zero status, or zero if all
 # commands in the pipeline exit successfully.
-set -e
+set -e -o pipefail
 
 # ###
 # section: Define functions
@@ -38,18 +38,21 @@ function initialize() {
 
 function is_help() {
     # Check is help mode
-    if [ "${#}" -eq 1 ]; then
+    while [ "$1" != "" ]; do
         case "$1" in
             --help|-help|help|--h|-h)
-                echo "YES"
+                return 0
                 ;;
         esac
-    fi
+        shift
+    done
+
+    return 1
 }
 
 # ###
 # section: Main script execution
 # ###
-if [ -z "$(is_help $@)" ]; then initialize; fi
+if ! is_help "$@"; then initialize; fi
 
 exec "$@"

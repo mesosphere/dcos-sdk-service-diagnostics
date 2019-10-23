@@ -16,7 +16,7 @@ fi
 
 if [ $# -lt 2 ]; then
   BASENAME=`basename "$0"`
-  echo "Error: DC/OS cluster username or password is not specified. Please, ensure you run the script with paramenters
+  echo "Error: DC/OS cluster username or password is not specified. Please, ensure you run the script with parameters
     '${BASENAME} <username> <password>'" >&2
   exit 2
 fi
