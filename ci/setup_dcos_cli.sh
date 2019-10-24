@@ -1,6 +1,25 @@
 #!/bin/bash
 
-# DC/OS cluster setup command bash wrapper for CI
+## ##############################################################
+#%
+#% SYNOPSIS
+#+    ${SCRIPT_NAME} <username> <password>
+#%
+#% DESCRIPTION
+#%    Set up the CLI to communicate with a DC/OS cluster.
+#%
+#% ARGUMENTS
+#%    <username>    the username for DC/OS login.
+#%    <password>    the password in the command line (insecure)
+#%
+#% EXAMPLES
+#%    ${SCRIPT_NAME} root swordfish
+#%
+#% NOTE
+#%    Make sure that the CLUSTER_URL environment variable was
+#%    exported.
+#%
+## ##############################################################
 
 # Exit immediately if a command exits with a non-zero status, or zero if all
 # commands in the pipeline exit successfully.

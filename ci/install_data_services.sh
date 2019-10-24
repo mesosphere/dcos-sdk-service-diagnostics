@@ -1,5 +1,25 @@
 #!/bin/bash
 
+## ##############################################################
+#%
+#% SYNOPSIS
+#+    ${SCRIPT_NAME} <service> [<service> ...]
+#%
+#% DESCRIPTION
+#%    Bulk installation required for DC/OS services in parallel.
+#%
+#% ARGUMENTS
+#%    <service>    DC/OS service name, e.g., cassandra, elastic
+#%
+#% EXAMPLES
+#%    ${SCRIPT_NAME} cassandra elastic hdfs
+#%
+#% NOTE
+#%    Before run script user needs to run set up to communicate
+#%    with a DC/OS cluster.
+#%
+## ##############################################################
+
 # Exit immediately if a command exits with a non-zero status, or zero if all
 # commands in the pipeline exit successfully.
 set -eu
