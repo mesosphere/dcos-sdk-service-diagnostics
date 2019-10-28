@@ -49,7 +49,7 @@ def diagnostic(service_name):
     subprocess.check_call(cmd)
 
 
-def get_args() -> (str, list):
+def get_args() -> (str, str, list):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -86,7 +86,7 @@ def main() -> int:
     :rtype: int
     """
 
-    val, func, services = get_args()
+    job_type, func, services = get_args()
 
     result = 0
     # Statement to ensure threads are cleaned up promptly
@@ -96,7 +96,7 @@ def main() -> int:
             try:
                 thread.result()
             except Exception:
-                log.error("Execution failed: {}".format(val))
+                log.exception("Execution failed: {}".format(job_type))
                 result = 1
 
     return result
