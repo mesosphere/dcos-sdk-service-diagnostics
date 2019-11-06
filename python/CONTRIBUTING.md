@@ -72,6 +72,8 @@ Requires AWS S3 credentials.
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
 
+   1. Make sure you are in the [correct directory](.)!
+
    1. Version bucket
 
       ```bash
