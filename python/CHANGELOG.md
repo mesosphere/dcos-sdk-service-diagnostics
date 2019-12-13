@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.7.0 (2019-12-13)
+
+### New features
+   - Added support for DC/OS 2.1-dev clusters.
+   ([PR #22](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/28))
+
+
 ## v0.6.0 (2019-10-14)
 
 ### New features
