@@ -26,7 +26,8 @@ function initialize() {
 1.11
 1.12
 1.13
-1.14"
+1.14
+2.0"
   if ! echo "${SUPPORTED_DCOS_VERSIONS}" | grep -qx "${DCOS_CLUSTER_MAJOR_MINOR_VERSION}"; then
     echo "DC/OS ${DCOS_CLUSTER_MAJOR_MINOR_VERSION}.x is not supported by this tool."
     echo "Supported DC/OS versions: ${SUPPORTED_DCOS_VERSIONS}."
