@@ -136,6 +136,7 @@ BASE_TECH_BUNDLE = {
     "beta-kafka": KafkaBundle,
     "cassandra": CassandraBundle,
     "confluent-kafka": KafkaBundle,
+    "datastax-dse": CassandraBundle,
     "elastic": ElasticBundle,
     "hdfs": HdfsBundle,
     "kafka": KafkaBundle,
