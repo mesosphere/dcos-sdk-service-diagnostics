@@ -130,7 +130,7 @@ class ServiceBundle(Bundle):
                 response.status_code, response.text
             )
         else:
-            self.write_file("service_v1_debug_taskreservations.json", response.text)
+            self.write_file("service_v1_debug_reservations.json", response.text)
 
     @functools.lru_cache()
     @config.retry
