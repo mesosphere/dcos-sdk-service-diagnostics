@@ -37,7 +37,7 @@ v2/debug/offers below in upcoming releases.
 1. Download the latest version
 
    ```bash
-   wget https://infinity-artifacts.s3.amazonaws.com/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh
+   wget https://raw.githubusercontent.com/mesosphere/dcos-sdk-service-diagnostics/master/python/create_service_diagnostics_bundle.sh
    chmod +x create_service_diagnostics_bundle.sh
    ```
 
