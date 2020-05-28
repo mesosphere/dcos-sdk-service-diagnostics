@@ -18,13 +18,17 @@ def main() -> int:
         bootstrap.check_authentication()
         bootstrap.check_attached_cluster()
 
-        s = "  {:18}{}"
+        info = {
+            "Package": bootstrap.package_name,
+            "Package version": bootstrap.package_version,
+            "Service name": bootstrap.service_name,
+            "DC/OS version": bootstrap.dcos_version,
+            "Cluster URL": bootstrap.cluster_url,
+        }
+
         print("Will create bundle for:")
-        print(s.format("Package:", bootstrap.package_name))
-        print(s.format("Package version:", bootstrap.package_version))
-        print(s.format("Service name:", bootstrap.service_name))
-        print(s.format("DC/OS version:", bootstrap.dcos_version))
-        print(s.format("Cluster URL:", bootstrap.cluster_url))
+        for title, val in info.items():
+            print("  {:18}{}".format(title + ":", val))
 
         if bootstrap.should_prompt_user:
             answer = input("\nProceed? [Y/n]: ")

@@ -68,10 +68,11 @@ Requires AWS S3 credentials.
 
 1. Build and publish Docker image tagged with the desired version
 
-   - With the [Jenkins job](https://jenkins.mesosphere.com/service/jenkins/view/Infinity/job/infinity-tools/job/release-tools/job/build-docker-image/parambuild/?delay=0sec&DOCKER_FILE_PATH=python/Dockerfile&DOCKER_ORG=mesosphere&IMAGE_NAME=dcos-sdk-service-diagnostics&GITHUB_ORG=mesosphere&GITHUB_REPO=dcos-sdk-service-diagnostics&GIT_REF=master&IMAGE_TAG=REPLACE_THIS_WITH_JUST_vX.Y.Z) - this link pre-populates all fields to correct values, except for `IMAGE_TAG`. Make sure you set it to the same value as you set in the previous step.
+   - With the Jenkins job - this link pre-populates all fields to correct values, except for IMAGE_TAG. Make sure you set it to the same value as you set in the previous step.
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
 
+   1. Upload script to versioned bucket
    1. Make sure you are in the [correct directory](.)!
 
    1. Version bucket
