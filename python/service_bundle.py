@@ -121,7 +121,7 @@ class ServiceBundle(Bundle):
             self.write_file("service_v1_debug_taskStatuses.json", response.text)
 
     @config.retry
-    def create_reservations_file(self):
+    def create_taskreservations_file(self):
         response = sdk_cmd.service_request("GET", self.service_name, "/v1/debug/reservations",
                                            raise_on_error=False)
         if not response.ok:
