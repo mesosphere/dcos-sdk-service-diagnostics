@@ -7,7 +7,7 @@
 set -eu -o pipefail
 
 # Script version goes here
-readonly VERSION='v0.7.0'
+readonly VERSION='v0.8.0'
 
 # ###
 # section: Check requirements before main execution.

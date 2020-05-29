@@ -15,6 +15,7 @@ v2/debug/offers below in upcoming releases.
 - `https://$cluster/$service/v2/debug/offers` output
 - `https://$cluster/$service/v1/debug/plans` output
 - `https://$cluster/$service/v1/debug/taskStatuses` output
+- `https://$cluster/$service/v1/debug/reservations` output
 - `https://$cluster/$service/v1/configurations/$configuration_id` output for all
   `$configuration_id`s
 - Output of base-tech specific diagnostics commands (e.g.: Cassandra's `nodetool
@@ -37,7 +38,7 @@ v2/debug/offers below in upcoming releases.
 1. Download the latest version
 
    ```bash
-   wget https://infinity-artifacts.s3.amazonaws.com/dcos-commons/diagnostics/latest/create_service_diagnostics_bundle.sh
+   wget https://raw.githubusercontent.com/mesosphere/dcos-sdk-service-diagnostics/master/python/create_service_diagnostics_bundle.sh
    chmod +x create_service_diagnostics_bundle.sh
    ```
 
