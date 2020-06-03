@@ -68,7 +68,7 @@ Requires AWS S3 credentials.
 
 1. Build and publish Docker image tagged with the desired version
 
-   - With the Jenkins job - this link pre-populates all fields to correct values, except for IMAGE_TAG. Make sure you set it to the same value as you set in the previous step.
+   - With the Jenkins job - this [link](https://jenkins.mesosphere.com/service/jenkins/view/Infinity/job/infinity-tools/job/release-tools/job/retag-docker-image/build?delay=0sec) pre-populates all fields to correct values, except for IMAGE_TAG. Make sure you set it to the same value as you set in the previous step ([more info](https://wiki.d2iq.com/display/ENG/%5BDockerhub%5D+Releasing+Mesosphere+Tagged+Images)).
 
 1. Publish shell script (which will use the Docker image tagged with the same version)
 
