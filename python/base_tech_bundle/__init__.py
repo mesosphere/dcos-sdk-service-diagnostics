@@ -141,6 +141,7 @@ BASE_TECH_BUNDLE = {
     "kafka": KafkaBundle,
     "kubernetes": KubernetesBundle,
     "edgelb-pool": EdgeLBBundle,
+    "datastax-dse": CassandraBundle,
 }
 
 

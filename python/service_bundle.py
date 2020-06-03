@@ -109,7 +109,7 @@ class ServiceBundle(Bundle):
             self.write_file("service_v1_debug_plans.json", response.text)
 
     @config.retry
-    def create_taskstatuses_file(self):
+    def create_task_statuses_file(self):
         response = sdk_cmd.service_request("GET", self.service_name, "/v1/debug/taskStatuses",
                                            raise_on_error=False)
         if not response.ok:
@@ -121,7 +121,7 @@ class ServiceBundle(Bundle):
             self.write_file("service_v1_debug_taskStatuses.json", response.text)
 
     @config.retry
-    def create_reservations_file(self):
+    def create_task_reservations_file(self):
         response = sdk_cmd.service_request("GET", self.service_name, "/v1/debug/reservations",
                                            raise_on_error=False)
         if not response.ok:
@@ -197,8 +197,8 @@ class ServiceBundle(Bundle):
         self.create_offers_file()
         self.create_v2_offers_file()
         self.create_plans_file()
-        self.create_taskstatuses_file()
-        self.create_taskreservations_file()
+        self.create_task_statuses_file()
+        self.create_task_reservations_file()
         self.create_configuration_ids_file()
         self.create_configuration_target_id_file()
         self.create_configuration_files()

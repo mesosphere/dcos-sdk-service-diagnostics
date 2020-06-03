@@ -1,11 +1,24 @@
 # CHANGELOG
 
+## v0.8.0 (2020-05-29)
+
+### New features
+   - Set up CI for service diagnostics script.
+   ([PR #35](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/35))
+   - Add support for Datastax-DSE Diagnostic Bundles.
+   - Add support for DC/OS 2.2-dev clusters.
+
+## v0.7.1 (2020-05-27)
+
+### New features
+   - Bug fix for v0.7.0 where incorrect funtion was called for Reservations endpoint.
+   ([PR #33](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/33))
+
 ## v0.7.0 (2019-12-13)
 
 ### New features
    - Added support for DC/OS 2.1-dev clusters.
    ([PR #28](https://github.com/mesosphere/dcos-sdk-service-diagnostics/pull/28))
-
 
 ## v0.6.0 (2019-10-14)
 
