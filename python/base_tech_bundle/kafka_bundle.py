@@ -27,6 +27,8 @@ class KafkaBundle(BaseTechBundle):
         if brokers:
             for broker_id in brokers:
                 self.create_broker_get_file(broker_id)
+        self.create_unavailable_partitions_file()
+        self.create_under_replicated_partitions_file()
 
     @config.retry
     def create_broker_list_file(self):
@@ -70,3 +72,35 @@ class KafkaBundle(BaseTechBundle):
             if stderr:
                 logger.warning("Non-fatal broker get %s message\nstderr: '%s'", broker_id, stderr)
             self.write_file("service_broker_get_%s.json" % broker_id, stdout)
+
+    @config.retry
+    def create_unavailable_partitions_file(self):
+        rc, stdout, stderr = sdk_cmd.svc_cli(
+            self.cli_subcommand_name, self.service_name, "topic unavailable_partitions", print_output=False
+        )
+
+        if rc != 0:
+            logger.error(
+                "Could not perform topic unavailable_partitions. return-code: '%s'\n"
+                "stdout: '%s'\nstderr: '%s'", rc, stdout, stderr
+            )
+        else:
+            if stderr:
+                logger.warning("Non-fatal topic unavailable_partitions message\nstderr: '%s'", stderr)
+            self.write_file("service_topic_unavailable_partitions.json", stdout)
+
+    @config.retry
+    def create_under_replicated_partitions_file(self):
+        rc, stdout, stderr = sdk_cmd.svc_cli(
+            self.cli_subcommand_name, self.service_name, "topic under_replicated_partitions", print_output=False
+        )
+
+        if rc != 0:
+            logger.error(
+                "Could not perform topic under_replicated_partitions. return-code: '%s'\n"
+                "stdout: '%s'\nstderr: '%s'", rc, stdout, stderr
+            )
+        else:
+            if stderr:
+                logger.warning("Non-fatal topic under_replicated_partitions message\nstderr: '%s'", stderr)
+            self.write_file("service_topic_under_replicated_partitions.json", stdout)
