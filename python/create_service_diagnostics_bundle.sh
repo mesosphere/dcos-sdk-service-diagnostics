@@ -7,7 +7,7 @@
 set -eu -o pipefail
 
 # Script version goes here
-readonly VERSION='v0.8.0'
+readonly VERSION='v0.9.0'
 
 # ###
 # section: Check requirements before main execution.
@@ -37,7 +37,7 @@ function is_development_mode() {
 
 function run_in_container() {
   local TTY_OPTS="${TTY_OPTS:=-it}"
-  local DOCKER_IMAGE="mesosphere/dcos-sdk-service-diagnostics:${VERSION}"
+  local DOCKER_IMAGE="kaiwalyarjoshi/dcos-sdk-service-diagnostics:${VERSION}"
 
   # Docker volumes configuration
   local HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"

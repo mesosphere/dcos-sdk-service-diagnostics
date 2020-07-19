@@ -142,6 +142,10 @@ BASE_TECH_BUNDLE = {
     "kubernetes": KubernetesBundle,
     "edgelb-pool": EdgeLBBundle,
     "datastax-dse": CassandraBundle,
+    "portworx-kafka": KafkaBundle,
+    "portworx-cassandra": CassandraBundle,
+    "portworx-elastic": ElasticBundle,
+    "portworx-hdfs": HdfsBundle,
 }
 
 
