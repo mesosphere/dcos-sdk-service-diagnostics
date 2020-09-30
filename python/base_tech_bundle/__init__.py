@@ -122,11 +122,12 @@ class BaseTechBundle(ServiceBundle):
 
 
 from .cassandra_bundle import CassandraBundle  # noqa: E402
+from .edgelb_bundle import EdgeLBBundle   # noqa: E402
 from .elastic_bundle import ElasticBundle  # noqa: E402
 from .hdfs_bundle import HdfsBundle  # noqa: E402
 from .kafka_bundle import KafkaBundle  # noqa: E402
 from .kubernetes_bundle import KubernetesBundle   # noqa: E402
-from .edgelb_bundle import EdgeLBBundle   # noqa: E402
+from .nifi_bundle import NifiBundle   # noqa: E402
 
 
 BASE_TECH_BUNDLE = {
@@ -136,12 +137,13 @@ BASE_TECH_BUNDLE = {
     "beta-kafka": KafkaBundle,
     "cassandra": CassandraBundle,
     "confluent-kafka": KafkaBundle,
+    "datastax-dse": CassandraBundle,
+    "edgelb-pool": EdgeLBBundle,
     "elastic": ElasticBundle,
     "hdfs": HdfsBundle,
     "kafka": KafkaBundle,
     "kubernetes": KubernetesBundle,
-    "edgelb-pool": EdgeLBBundle,
-    "datastax-dse": CassandraBundle,
+    "nifi": NifiBundle
 }
 
 
@@ -160,8 +162,9 @@ __all__ = [
     "BaseTechBundle",
     "CassandraBundle",
     "ElasticBundle",
+    "EdgeLBBundle",
     "HdfsBundle",
     "KafkaBundle",
     "KubernetesBundle",
-    "EdgeLBBundle",
+    "NifiBundle"
 ]
