@@ -43,6 +43,10 @@ class ServiceBundle(Bundle):
         task_ids = [t["id"] for t in self.running_tasks() if t["name"].startswith(prefix)]
         self.run_on_tasks(fn, task_ids)
 
+    def for_each_running_task_with_suffix(self, suffix, fn):
+        task_ids = [t["id"] for t in self.running_tasks() if t["name"].endswith(suffix)]
+        self.run_on_tasks(fn, task_ids)
+
     def download_log_files(self):
         all_tasks = self.scheduler_tasks + self.tasks()
 
