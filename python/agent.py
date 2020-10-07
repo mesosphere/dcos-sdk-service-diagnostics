@@ -133,7 +133,7 @@ def download_task_files(
 ) -> List[dict]:
     agent_id = task["slave_id"]
     task_id = task["id"]
-    task_folder_name = build_task_folder_mame(task)
+    task_folder_name = build_task_folder_name(task)
 
     executor_sandbox = browse_executor_sandbox(agent_id, executor_sandbox_path)
     pod_task_sandbox = browse_task_sandbox(agent_id, executor_sandbox_path, task_id)
@@ -155,7 +155,33 @@ def download_task_files(
         download_sandbox_files(agent_id, executor_sandbox, output_directory, patterns_to_download)
 
 
-def build_task_folder_mame(task):
+# Download files only in task's sandbox, ignoring executor's sandbox
+def download_task_only_files(
+        task,
+        executor_sandbox_path: str,
+        base_path: str,
+        patterns_to_download: List[str] = [],
+) -> None:
+    agent_id = task["slave_id"]
+    task_id = task["id"]
+    task_folder_name = build_task_folder_name(task)
+    pod_task_sandbox = browse_task_sandbox(agent_id, executor_sandbox_path, task_id)
+
+    # Pod task: download files under its sandbox
+    if pod_task_sandbox:
+        output_pod_task_directory = os.path.join(base_path, task_folder_name, "task")
+        download_sandbox_files(
+            agent_id, pod_task_sandbox, output_pod_task_directory, patterns_to_download
+        )
+
+    else:
+        logger.error(
+            "download_task_only_files(): could not locate task sandbox for agent_id=%s, task_id=%s\n"
+            "Requested files cannot be downloaded!", agent_id, task_id
+        )
+
+
+def build_task_folder_name(task):
     match = re.search("([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})", task["id"])
     if match is not None:
         task_uuid = match.group(0)

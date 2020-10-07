@@ -47,6 +47,15 @@ class ServiceBundle(Bundle):
         task_ids = [t["id"] for t in self.running_tasks() if t["name"].endswith(suffix)]
         self.run_on_tasks(fn, task_ids)
 
+    # tasks can be self.running_tasks() or self.tasks() or self.scheduler_tasks + self.tasks()
+    @staticmethod
+    def get_tasks_with_prefix(prefix, tasks: List) -> List:
+        return [t for t in tasks if t["name"].startswith(prefix)]
+
+    @staticmethod
+    def get_tasks_with_suffix(suffix, tasks: List) -> List:
+        return [t for t in tasks if t["name"].endswith(suffix)]
+
     def download_log_files(self):
         all_tasks = self.scheduler_tasks + self.tasks()
 
@@ -64,6 +73,31 @@ class ServiceBundle(Bundle):
                         task_executor_sandbox_path,
                         os.path.join(self.output_directory, "tasks"),
                         self.DOWNLOAD_FILES_WITH_PATTERNS,
+                    )
+                else:
+                    log.info(
+                        "Could not find executor sandbox path for task '%s'. "
+                        "This probably means that its agent ('%s') is missing",
+                        task["id"],
+                        task["slave_id"],
+                    )
+
+    # version which takes list of tasks and patterns of log files to be downloaded
+    def download_task_log_files(self, tasks: List, patterns_to_download: List[str]):
+        tasks_by_agent_id = dict(groupby("slave_id", tasks))
+
+        for agent_id, tasks in tasks_by_agent_id.items():
+            agent_files = agent.debug_agent_files(agent_id)
+            for task in tasks:
+                task_executor_sandbox_path = sdk_diag._find_matching_executor_path(
+                    agent_files, sdk_diag._TaskEntry(task)
+                )
+                if task_executor_sandbox_path:
+                    agent.download_task_only_files(
+                        task,
+                        task_executor_sandbox_path,
+                        os.path.join(self.output_directory, "tasks"),
+                        patterns_to_download
                     )
                 else:
                     log.info(

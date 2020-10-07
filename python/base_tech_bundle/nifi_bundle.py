@@ -123,4 +123,8 @@ class NifiBundle(BaseTechBundle):
         self.create_plan_list_file()
         # run nifi toolkit's diagnostic commands
         self.create_tasks_toolkit_output_files()
+        # download nifi log files like nifi-app.log, nifi-bootstrap.log, nifi-user.log, etc.
+        self.download_task_log_files(
+            self.get_tasks_with_suffix("-node", self.tasks()), ["^nifi-.*\\.log$"]
+        )
 
