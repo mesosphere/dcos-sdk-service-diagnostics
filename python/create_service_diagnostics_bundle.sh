@@ -43,7 +43,7 @@ function run_in_container() {
   local HOST_DCOS_CLI_DIRECTORY="${DCOS_DIR:-${HOME}/.dcos}"
   local CONTAINER_BUNDLES_DIRECTORY="/${BUNDLES_DIRECTORY}"
   local CONTAINER_DCOS_CLI_DIRECTORY_RO="/dcos-cli-directory"
-
+  
   docker run \
           "${TTY_OPTS}" \
           --rm \
@@ -51,6 +51,7 @@ function run_in_container() {
           -v "${HOST_DCOS_CLI_DIRECTORY}:${CONTAINER_DCOS_CLI_DIRECTORY_RO}":ro \
           ${CONTAINER_DCOS_SERVICE_DIAGNOSTIC_VOLUME_MOUNT} \
           -e PYTHONPATH=${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}/dcos-commons/testing:${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY} \
+		  -w ${CONTAINER_DCOS_SERVICE_DIAGNOSTICS_DIRECTORY}  \
           "${DOCKER_IMAGE}" \
           sh -l -c "${*:-}"
 }
