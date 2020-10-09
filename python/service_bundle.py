@@ -82,8 +82,15 @@ class ServiceBundle(Bundle):
                         task["slave_id"],
                     )
 
-    # version which takes list of tasks and patterns of log files to be downloaded
-    def download_task_log_files(self, tasks: List, patterns_to_download: List[str]):
+    # Version which takes list of tasks, templated path and patterns of log files to be downloaded.
+    # Does download of files which match patterns in patterns_to_download. The files for download are located
+    # in target dir specified in path_to_files. Files for search must be in task's sandbox (executor's sandbox is ignored).
+    #
+    # param: path_to_files  Relative path to target dir from task sandbox root. The path elements can be RE expressions,
+    # marked by enclosing {}.
+    # Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify
+    #          this templated path: "{^nifi-(.+)$}/logs"
+    def download_task_log_files(self, tasks: List, path_to_files: str, file_patterns_to_download: List[str]):
         tasks_by_agent_id = dict(groupby("slave_id", tasks))
 
         for agent_id, tasks in tasks_by_agent_id.items():
@@ -97,7 +104,8 @@ class ServiceBundle(Bundle):
                         task,
                         task_executor_sandbox_path,
                         os.path.join(self.output_directory, "tasks"),
-                        patterns_to_download
+                        path_to_files,
+                        file_patterns_to_download
                     )
                 else:
                     log.info(

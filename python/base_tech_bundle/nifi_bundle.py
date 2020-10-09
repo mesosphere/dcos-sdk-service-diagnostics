@@ -34,7 +34,7 @@ class NifiBundle(BaseTechBundle):
 
     def create_cli_output_file(self, task_id):
         cmd = self.short_toolkit_cmd
-        full_toolkit_cmd = "${TOOLKIT_DIR}/bin/cli.sh {} -u {}".format(cmd, self.base_url)
+        full_toolkit_cmd = "${TOOLKIT_DIR}" + "/bin/cli.sh {} -u {}".format(cmd, self.base_url)
         rc, stdout, stderr = self.task_exec(task_id, full_toolkit_cmd)
 
         if rc != 0:
@@ -114,17 +114,17 @@ class NifiBundle(BaseTechBundle):
         self.create_configuration_file()  # this is identical to self.exec_cmd("describe")
         self.create_pod_status_file()     # this is identical to self.exec_cmd("pod status --json")
         self.create_plans_status_files()  # this is identical to plans: self.exec_cmd("plan status <plan> --json")
-        # run dcos nifi package's diagnostic commands
+        logger.info("Running dcos nifi package's diagnostic commands ...")
         self.create_debug_config_list_file()
         self.create_debug_config_target_id_file()
         self.create_debug_state_framework_id_file()
         self.create_debug_state_properties_file()
         self.create_endpoints_file()
         self.create_plan_list_file()
-        # run nifi toolkit's diagnostic commands
+        logger.info("Running nifi toolkit's diagnostic commands ...")
         self.create_tasks_toolkit_output_files()
-        # download nifi log files like nifi-app.log, nifi-bootstrap.log, nifi-user.log, etc.
+        logger.info("Downloading nifi log files like nifi-app.log, nifi-bootstrap.log, nifi-user.log, etc. ...")
         self.download_task_log_files(
-            self.get_tasks_with_suffix("-node", self.tasks()), ["^nifi-.*\\.log$"]
+            self.get_tasks_with_suffix("-node", self.tasks()), "{^nifi-(.+)$}/logs", ["^nifi-.*\\.log$"]
         )
 
