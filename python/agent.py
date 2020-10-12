@@ -82,15 +82,16 @@ def browse_task_sandbox(agent_id: str, executor_sandbox_path: str, task_id: str)
         return []
 
 
-# Does download of files which match patterns in patterns_to_download. The files for download are located
-# in target dir specified in path_to_files.
-#
-# param: path_to_files  Relative path to target dir from task sandbox root. The path elements can be RE expressions,
-# marked by enclosing {}.
-# Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify
-#          this templated path: "{^nifi-(.+)$}/logs"
 def download_task_files_deep(agent_id: str, task_id: str, executor_sandbox_path: str, path_to_files: str,
                              patterns_to_download: List[str], output_dir_base: str) -> int:
+    """
+    Downloads files which match patterns in 'patterns_to_download'. The files for download are located in target dir specified in 'path_to_files'.
+    Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify this templated path: "{^nifi-(.+)$}/logs"
+
+    :param path_to_files: Relative path to target dir from task sandbox root. The path elements can be RE expressions  marked by enclosing {}.
+    :param patterns_to_download: List of RE patterns matching basenames of log files
+    :return: status code marking success or specific failure case.
+    """
     task_sandbox_path = os.path.join(executor_sandbox_path, "tasks/{}/".format(task_id))
     task_sandbox = browse_agent_path(agent_id, task_sandbox_path)
     if not task_sandbox:
@@ -98,19 +99,19 @@ def download_task_files_deep(agent_id: str, task_id: str, executor_sandbox_path:
         return 3
     output_dir_path = output_dir_base
 
-    for t in path_to_files.split('/'):
+    for raw_path_element in path_to_files.split('/'):
         is_regexp_name = False
-        if t.startswith('{') and t.endswith('}'):
+        if raw_path_element.startswith('{') and raw_path_element.endswith('}'):
             is_regexp_name = True
-            path_name = t[1:len(t)-1]
+            path_name = raw_path_element[1:len(raw_path_element)-1]
         else:
-            path_name = t
+            path_name = raw_path_element
         # for patterned name in path we need to translate it into real dir name
         if is_regexp_name:
             if task_sandbox is None: task_sandbox = browse_agent_path(agent_id, task_sandbox_path)
             real_path_name = None
-            for x in task_sandbox:
-                file_basename = os.path.basename(x["path"])
+            for file_element in task_sandbox:
+                file_basename = os.path.basename(file_element["path"])
                 m = re.match(path_name, file_basename)
                 real_path_name = m.group(0) if m else None
                 if real_path_name:
@@ -212,20 +213,21 @@ def download_task_files(
         download_sandbox_files(agent_id, executor_sandbox, output_directory, patterns_to_download)
 
 
-# Does download of files which match patterns in patterns_to_download. The files for download are located
-# in target dir specified in path_to_files. Files for search must be in task's sandbox (executor's sandbox is ignored).
-#
-# param: path_to_files  Relative path to target dir from task sandbox root. The path elements can be RE expressions,
-# marked by enclosing {}.
-# Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify
-#          this templated path: "{^nifi-(.+)$}/logs"
 def download_task_only_files(
         task,
         executor_sandbox_path: str,
         base_path: str,
         path_to_files: str,
         patterns_to_download: List[str]
-) -> None:
+) -> int:
+    """
+    Downloads files which match patterns in 'patterns_to_download'. The files for download are located in target dir specified in 'path_to_files'.
+    Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify this templated path: "{^nifi-(.+)$}/logs"
+
+    :param path_to_files: Relative path to target dir from task sandbox root. The path elements can be RE expressions  marked by enclosing {}.
+    :param patterns_to_download: List of RE patterns matching basenames of log files
+    :return: status code marking success or specific failure case.
+    """
     agent_id = task["slave_id"]
     task_id = task["id"]
     task_folder_name = build_task_folder_name(task)
