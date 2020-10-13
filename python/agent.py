@@ -173,10 +173,8 @@ def download_sandbox_files(
         os.makedirs(output_base_path)
 
     for task_file in sandbox:
-        # print("download_sandbox_files: file_path = " + task_file["path"])
         task_file_basename = os.path.basename(task_file["path"])
         for pattern in patterns_to_download:
-            # print("download_sandbox_files: pattern = " + pattern)
             if re.match(pattern, task_file_basename):
                 download_agent_path(
                     agent_id, task_file["path"], os.path.join(output_base_path, task_file_basename)
