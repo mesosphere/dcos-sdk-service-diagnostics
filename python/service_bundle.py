@@ -43,6 +43,19 @@ class ServiceBundle(Bundle):
         task_ids = [t["id"] for t in self.running_tasks() if t["name"].startswith(prefix)]
         self.run_on_tasks(fn, task_ids)
 
+    def for_each_running_task_with_suffix(self, suffix, fn):
+        task_ids = [t["id"] for t in self.running_tasks() if t["name"].endswith(suffix)]
+        self.run_on_tasks(fn, task_ids)
+
+    # tasks can be self.running_tasks() or self.tasks() or self.scheduler_tasks + self.tasks()
+    @staticmethod
+    def get_tasks_with_prefix(prefix, tasks: List) -> List:
+        return [t for t in tasks if t["name"].startswith(prefix)]
+
+    @staticmethod
+    def get_tasks_with_suffix(suffix, tasks: List) -> List:
+        return [t for t in tasks if t["name"].endswith(suffix)]
+
     def download_log_files(self):
         all_tasks = self.scheduler_tasks + self.tasks()
 
@@ -60,6 +73,40 @@ class ServiceBundle(Bundle):
                         task_executor_sandbox_path,
                         os.path.join(self.output_directory, "tasks"),
                         self.DOWNLOAD_FILES_WITH_PATTERNS,
+                    )
+                else:
+                    log.info(
+                        "Could not find executor sandbox path for task '%s'. "
+                        "This probably means that its agent ('%s') is missing",
+                        task["id"],
+                        task["slave_id"],
+                    )
+
+    def download_task_log_files(self, tasks: List, path_to_files: str, file_patterns_to_download: List[str]):
+        """
+        Version which takes list of tasks, templated path and patterns of log files to be downloaded.
+        Downloads files which match patterns in 'patterns_to_download'. The files for download are located in target dir specified in 'path_to_files'.
+        Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify this templated path: "{^nifi-(.+)$}/logs"
+
+        :param tasks: List of tasks which sandboxes should be searched for matching log files
+        :param path_to_files: Relative path to target dir from task sandbox root. The path elements can be RE expressions  marked by enclosing {}.
+        :param file_patterns_to_download: List of RE patterns matching basenames of log files
+        """
+        tasks_by_agent_id = dict(groupby("slave_id", tasks))
+
+        for agent_id, tasks in tasks_by_agent_id.items():
+            agent_files = agent.debug_agent_files(agent_id)
+            for task in tasks:
+                task_executor_sandbox_path = sdk_diag._find_matching_executor_path(
+                    agent_files, sdk_diag._TaskEntry(task)
+                )
+                if task_executor_sandbox_path:
+                    agent.download_task_only_files(
+                        task,
+                        task_executor_sandbox_path,
+                        os.path.join(self.output_directory, "tasks"),
+                        path_to_files,
+                        file_patterns_to_download
                     )
                 else:
                     log.info(

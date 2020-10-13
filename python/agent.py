@@ -82,6 +82,59 @@ def browse_task_sandbox(agent_id: str, executor_sandbox_path: str, task_id: str)
         return []
 
 
+def download_task_files_deep(agent_id: str, task_id: str, executor_sandbox_path: str, path_to_files: str,
+                             patterns_to_download: List[str], output_dir_base: str) -> int:
+    """
+    Downloads files which match patterns in 'patterns_to_download'. The files for download are located in target dir specified in 'path_to_files'.
+    Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify this templated path: "{^nifi-(.+)$}/logs"
+
+    :param path_to_files: Relative path to target dir from task sandbox root. The path elements can be RE expressions  marked by enclosing {}.
+    :param patterns_to_download: List of RE patterns matching basenames of log files
+    :return: status code marking success or specific failure case.
+    """
+    task_sandbox_path = os.path.join(executor_sandbox_path, "tasks/{}/".format(task_id))
+    task_sandbox = browse_agent_path(agent_id, task_sandbox_path)
+    if not task_sandbox:
+        logger.error("download_task_files_deep: cannot read task sandbox dir %s", task_sandbox_path)
+        return 3
+    output_dir_path = output_dir_base
+
+    for raw_path_element in path_to_files.split('/'):
+        is_regexp_name = False
+        if raw_path_element.startswith('{') and raw_path_element.endswith('}'):
+            is_regexp_name = True
+            path_name = raw_path_element[1:len(raw_path_element)-1]
+        else:
+            path_name = raw_path_element
+        # for patterned name in path we need to translate it into real dir name
+        if is_regexp_name:
+            if task_sandbox is None: task_sandbox = browse_agent_path(agent_id, task_sandbox_path)
+            real_path_name = None
+            for file_element in task_sandbox:
+                file_basename = os.path.basename(file_element["path"])
+                m = re.match(path_name, file_basename)
+                real_path_name = m.group(0) if m else None
+                if real_path_name:
+                    task_sandbox_path = os.path.join(task_sandbox_path, real_path_name)
+                    output_dir_path = os.path.join(output_dir_path, real_path_name)
+                    break  # stop current search and proceed to next path_name
+            if real_path_name is None:
+                logger.error("download_task_files_deep: cannot find match for pattern '%s' in dir %s", path_name, task_sandbox_path)
+                return 2  # stop search completely -> report failure
+        else:
+            task_sandbox_path = os.path.join(task_sandbox_path, path_name)
+            output_dir_path = os.path.join(output_dir_path, path_name)
+        task_sandbox = None  # invalidate old sandbox
+
+    # download actual files from target dir
+    task_sandbox = browse_agent_path(agent_id, task_sandbox_path)
+    if task_sandbox:
+        download_sandbox_files(agent_id, task_sandbox, output_dir_path, patterns_to_download)
+        return 0  # target dir exist and not empty
+    else:
+        return 1  # either final path does not exist or target dir is empty
+
+
 @config.retry
 def download_agent_path(
     agent_id: str, agent_file_path: str, output_file_path: str, chunk_size: int = 8192
@@ -111,8 +164,11 @@ def download_agent_path(
 
 
 def download_sandbox_files(
-    agent_id: str, sandbox: List[dict], output_base_path: str, patterns_to_download: List[str] = []
-) -> List[dict]:
+    agent_id: str, sandbox: List[dict], output_base_path: str, patterns_to_download: List[str]
+) -> None:
+    if not sandbox:
+        logger.warning("download_sandbox_files: input file list is empty!")
+        return
     if not os.path.exists(output_base_path):
         os.makedirs(output_base_path)
 
@@ -133,7 +189,7 @@ def download_task_files(
 ) -> List[dict]:
     agent_id = task["slave_id"]
     task_id = task["id"]
-    task_folder_name = build_task_folder_mame(task)
+    task_folder_name = build_task_folder_name(task)
 
     executor_sandbox = browse_executor_sandbox(agent_id, executor_sandbox_path)
     pod_task_sandbox = browse_task_sandbox(agent_id, executor_sandbox_path, task_id)
@@ -155,7 +211,29 @@ def download_task_files(
         download_sandbox_files(agent_id, executor_sandbox, output_directory, patterns_to_download)
 
 
-def build_task_folder_mame(task):
+def download_task_only_files(
+        task,
+        executor_sandbox_path: str,
+        base_path: str,
+        path_to_files: str,
+        patterns_to_download: List[str]
+) -> int:
+    """
+    Downloads files which match patterns in 'patterns_to_download'. The files for download are located in target dir specified in 'path_to_files'.
+    Example. For downloading log files in any location of kind '<sandbox-root>/nifi-<version>/logs/' you can specify this templated path: "{^nifi-(.+)$}/logs"
+
+    :param path_to_files: Relative path to target dir from task sandbox root. The path elements can be RE expressions  marked by enclosing {}.
+    :param patterns_to_download: List of RE patterns matching basenames of log files
+    :return: status code marking success or specific failure case.
+    """
+    agent_id = task["slave_id"]
+    task_id = task["id"]
+    task_folder_name = build_task_folder_name(task)
+    output_dir_base = os.path.join(base_path, task_folder_name, "task")
+    download_task_files_deep(agent_id, task_id, executor_sandbox_path, path_to_files, patterns_to_download, output_dir_base)
+
+
+def build_task_folder_name(task):
     match = re.search("([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})", task["id"])
     if match is not None:
         task_uuid = match.group(0)
