@@ -85,3 +85,9 @@ $ zip -r my-dcos-cluster_prod__cassandra_20180912T142246Z.zip my-dcos-cluster_pr
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Updating
+When a new version with singnificant changes is created, please updated the external user-facing KB article found here: https://support.d2iq.com/s/article/create-service-diag-bundle
+
+
+For air-gapped customers, its important that they pull down the correct version to debug and diagnose the issue.
